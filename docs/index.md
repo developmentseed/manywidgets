@@ -42,6 +42,12 @@ pip install "manywidgets[lonboard]"
 [`Grid`](widgets/grid.ipynb) — arrange widgets side-by-side while keeping them
 linked, live and in static export.
 
+**Lonboard interop** (optional, `pip install "manywidgets[lonboard]"`):
+[`LayerToggle`](widgets/layer_toggle.ipynb),
+[`FilterBinder`](widgets/filter_binder.ipynb),
+[`LayerFilter`](widgets/layer_filter.ipynb) — drive a lonboard map's layers. See
+the [lonboard guide](guides/lonboard.md).
+
 **Linking:** `Binder` — link a widget's trait into another with a transform or
 nested path (see the [linking guide](guides/linking.md)).
 

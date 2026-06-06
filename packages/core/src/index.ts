@@ -87,6 +87,17 @@ export function stripIpy(id: string | null | undefined): string {
   return id ? String(id).replace(/^IPY_MODEL_/, "") : "";
 }
 
+/**
+ * Normalize a widget reference (from a `widget_serialization` trait) to a model id.
+ * Static export gives an `IPY_MODEL_<id>` string; a live kernel may give a resolved
+ * model object (use its `model_id`). Returns `""` if it can't be determined.
+ */
+export function idOf(ref: unknown): string {
+  if (typeof ref === "string") return stripIpy(ref);
+  const m = ref as { model_id?: string } | null | undefined;
+  return m && typeof m.model_id === "string" ? m.model_id : "";
+}
+
 /** Coerce a value to a finite number, or return `fallback`. */
 export function asNumber(value: unknown, fallback = 0): number {
   const n = typeof value === "number" ? value : Number(value);

@@ -7,11 +7,11 @@ and are authored to **render statically (no kernel)** when a notebook is exporte
 with the [`myst-anywidget-static-export`](https://github.com/developmentseed/myst-anywidget-static-export)
 MyST plugin — while remaining ordinary anywidgets in a live kernel.
 
-> **Status:** early. v1 ships `Chart`, input controls (`Slider`, `RangeSlider`,
-> `Dropdown`, `Toggle`, `Button`, `NumberInput`), value displays (`Stat`,
-> `NumberDisplay`, `Text`), layout containers (`Row`, `Column`, `Grid`), and the
-> `Binder` linking primitive. First-class lonboard interop widgets are the next
-> milestone; see `manywidgets-plan.md`.
+> **Status:** early but feature-complete for v1 — `Chart`, input controls (`Slider`,
+> `RangeSlider`, `Dropdown`, `Toggle`, `Button`, `NumberInput`), value displays
+> (`Stat`, `NumberDisplay`, `Text`), layout containers (`Row`, `Column`, `Grid`),
+> the `Binder` linking primitive, and optional lonboard interop (`LayerToggle`,
+> `FilterBinder`, `LayerFilter`).
 
 ## Install
 
@@ -42,6 +42,9 @@ from manywidgets import (
     Row, Column, Grid,                       # layout (arrange + keep children linked)
     Binder,                                  # linking with transforms / nested paths
 )
+
+# Optional lonboard interop (pip install "manywidgets[lonboard]")
+from manywidgets.lonboard import LayerToggle, FilterBinder, LayerFilter
 ```
 
 ## Linking widgets
@@ -94,7 +97,8 @@ introspection — so the per-widget pages are **generated build artifacts**
 (gitignored), not hand-maintained. Build and view:
 
 ```bash
-pip install -e ".[numpy]" ipykernel nbconvert nbformat
+# lonboard + geopandas + pyarrow are only needed for the lonboard interop example
+pip install -e ".[numpy,lonboard]" ipykernel nbconvert nbformat geopandas pyarrow
 python -m ipykernel install --user --name manywidgets-venv
 npm run docs:gen       # generate docs/widgets/*.ipynb from each widget's doc.md
 jupyter nbconvert --to notebook --execute --inplace docs/examples/*.ipynb docs/widgets/*.ipynb

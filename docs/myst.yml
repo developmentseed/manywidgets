@@ -39,14 +39,21 @@ project:
         - file: widgets/row.ipynb
         - file: widgets/column.ipynb
         - file: widgets/grid.ipynb
+    - title: Lonboard
+      children:
+        - file: widgets/layer_toggle.ipynb
+        - file: widgets/filter_binder.ipynb
+        - file: widgets/layer_filter.ipynb
     - title: Guides
       children:
         - file: guides/linking.md
         - file: guides/create-your-own-widget.md
         - file: guides/static-export.md
+        - file: guides/lonboard.md
     - title: Examples
       children:
         - file: examples/demo.ipynb
+        - file: examples/lonboard-map.ipynb
 site:
   template: book-theme
   nav:

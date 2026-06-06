@@ -1,0 +1,51 @@
+# FilterBinder
+
+Drive a [lonboard](https://developmentseed.org/lonboard/) layer's `filter_range`
+from a `RangeSlider` (uses the layer's `DataFilterExtension`). Works live and in
+static export.
+
+```{note}
+`manywidgets.lonboard` is optional — install it with
+`pip install "manywidgets[lonboard]"`. See the [lonboard guide](../guides/lonboard.md).
+This page is reference only; the [interop example](../examples/lonboard-map.ipynb)
+shows a **live map** with these controls.
+```
+
+## Import
+
+```python
+from manywidgets.lonboard import FilterBinder
+```
+
+## Usage
+
+```python
+from lonboard import Map, ScatterplotLayer
+from lonboard.layer_extension import DataFilterExtension
+from manywidgets import RangeSlider, Column
+from manywidgets.lonboard import FilterBinder
+
+layer = ScatterplotLayer.from_geopandas(
+    gdf,
+    extensions=[DataFilterExtension(filter_size=1)],
+    get_filter_value=values,           # one float per row
+    filter_range=(lo, hi),
+)
+m = Map(layer, basemap=None)
+slider = RangeSlider(min=lo, max=hi, low=lo, high=hi)
+binder = FilterBinder(slider, layer)   # slider.low/high -> layer.filter_range
+
+Column(slider, binder, m)
+```
+
+## API
+
+{api-table}
+
+## Caveats (static export)
+
+- **Use seconds, not milliseconds** for time filters: `DataFilterExtension` compares
+  as float32 in the shader and millisecond timestamps overflow its exact-integer
+  range. Set `get_filter_value` in seconds and feed the slider seconds too.
+- The write fans out to every layer proxy and re-applies for late-loading proxies.
+- For single-ended filtering, pass a `Slider` and set `low_field=high_field="value"`.

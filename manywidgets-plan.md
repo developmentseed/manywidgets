@@ -113,11 +113,15 @@ complete, copyable unit. Cross-widget tests live at the repo-root `tests/`.
 > gitignored build artifacts. **Layout widgets** (`Row`/`Column`/`Grid`) are now built on the static-export
 > plugin's `host.renderChild` hook (shipped in plugin **v0.2.0**, pinned in `docs/myst.yml`); children are
 > mounted via `@manywidgets/core`'s `renderChild` (static: `host.renderChild`; live:
-> `widget_manager.create_view`) and stay linked. **Remaining:**
-> - `manywidgets.lonboard` interop widgets (`LayerToggle`, `MapFlyer`, `FilterBinder`) — deferred (next pass).
-> - Optional later: nested-list `Grid` API; a generic `Layout` widget.
+> `widget_manager.create_view`) and stay linked. **`manywidgets.lonboard`** interop is now built too:
+> `LayerToggle` (`visible`), `FilterBinder` ((Range)Slider → `filter_range`), and `LayerFilter`
+> (`filter_categories`) — an optional, import-guarded subpackage (`pip install "manywidgets[lonboard]"`)
+> that drives a referenced lonboard layer via `core.resolveModel` (multi-proxy fan-out + poll). **MapFlyer
+> was dropped** — lonboard's `Map.view_state` is uncontrolled (deck.gl `initialViewState`), so writing it
+> can't re-position a rendered map; documented in `docs/guides/lonboard.md`.
 >
-> See `docs/upstream/static-export-plugin-notes.md` (§1 + §4 marked SHIPPED in v0.2.0) for the plugin
+> **Remaining / optional later:** nested-list `Grid` API; a generic `Layout` widget; richer lonboard
+> examples. See `docs/upstream/static-export-plugin-notes.md` (§1 + §4 SHIPPED in v0.2.0) for the plugin
 > contract history.
 
 ---

@@ -34,7 +34,9 @@ jobs:
       # Install the package + a kernel so the example notebooks can be executed.
       # numpy is needed by the Chart examples (it's an optional extra); nbformat
       # for the doc generator.
-      - run: pip install -e ".[numpy]" ipykernel nbconvert nbformat
+      # lonboard + geopandas (+ pyarrow for geopandas->arrow) power the lonboard
+      # interop example.
+      - run: pip install -e ".[numpy,lonboard]" ipykernel nbconvert nbformat geopandas pyarrow
       - run: python -m ipykernel install --user --name manywidgets-venv
 
       # Generate the per-widget doc notebooks from each widget's co-located

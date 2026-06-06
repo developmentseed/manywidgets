@@ -38,9 +38,20 @@ _CODE_CELL_RE = re.compile(r"```\{code-cell\}[^\n]*\n(.*?)\n```", re.DOTALL)
 
 
 def class_for(dir_name: str):
-    """src dir name -> the exported widget class (e.g. number_input -> NumberInput)."""
+    """src dir name -> the exported widget class (e.g. number_input -> NumberInput).
+
+    Looks in the top-level ``manywidgets`` namespace first, then the optional
+    ``manywidgets.lonboard`` subpackage. Returns None if it can't be resolved
+    (e.g. lonboard isn't installed) so the caller can skip that page gracefully.
+    """
     cls_name = "".join(part.capitalize() for part in dir_name.split("_"))
-    return getattr(manywidgets, cls_name)
+    if hasattr(manywidgets, cls_name):
+        return getattr(manywidgets, cls_name)
+    try:
+        import manywidgets.lonboard as _lon
+    except ImportError:
+        return None
+    return getattr(_lon, cls_name, None)
 
 
 def public_traits(cls):
@@ -105,9 +116,12 @@ def _inject_api(markdown: str, cls) -> str:
 def main() -> int:
     DOCS_OUT.mkdir(parents=True, exist_ok=True)
     count = 0
-    for doc_path in sorted(WIDGETS_SRC.glob("*/doc.md")):
+    for doc_path in sorted(WIDGETS_SRC.rglob("doc.md")):  # nested (lonboard/) too
         name = doc_path.parent.name
         cls = class_for(name)
+        if cls is None:
+            print(f"skip {name} (class not importable — is the [lonboard] extra installed?)")
+            continue
         nb = nbf.v4.new_notebook()
         nb["cells"] = build_cells(doc_path.read_text(), cls)
         nb["metadata"] = {"kernelspec": KERNEL, "language_info": {"name": "python"}}
