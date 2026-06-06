@@ -9,8 +9,9 @@ MyST plugin — while remaining ordinary anywidgets in a live kernel.
 
 > **Status:** early. v1 ships `Chart`, input controls (`Slider`, `RangeSlider`,
 > `Dropdown`, `Toggle`, `Button`, `NumberInput`), value displays (`Stat`,
-> `NumberDisplay`, `Text`), and the `Binder` linking primitive. First-class
-> lonboard interop widgets are the next milestone; see `manywidgets-plan.md`.
+> `NumberDisplay`, `Text`), layout containers (`Row`, `Column`, `Grid`), and the
+> `Binder` linking primitive. First-class lonboard interop widgets are the next
+> milestone; see `manywidgets-plan.md`.
 
 ## Install
 
@@ -38,6 +39,7 @@ from manywidgets import (
     Chart,                                   # Chart.js charts
     Slider, RangeSlider, Dropdown, Toggle, Button, NumberInput,  # input controls
     Stat, NumberDisplay, Text,               # value displays
+    Row, Column, Grid,                       # layout (arrange + keep children linked)
     Binder,                                  # linking with transforms / nested paths
 )
 ```

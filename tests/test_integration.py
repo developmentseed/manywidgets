@@ -11,10 +11,13 @@ from manywidgets import (
     Binder,
     Button,
     Chart,
+    Column,
     Dropdown,
+    Grid,
     NumberDisplay,
     NumberInput,
     RangeSlider,
+    Row,
     Slider,
     Stat,
     Text,
@@ -33,6 +36,9 @@ ALL_WIDGETS = [
     NumberDisplay,
     Text,
     Binder,
+    Row,
+    Column,
+    Grid,
 ]
 
 

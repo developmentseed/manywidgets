@@ -25,8 +25,22 @@ export interface AnyModel {
   save_changes?: () => void;
   on?: (event: string, cb: (...args: unknown[]) => void) => void;
   off?: (event: string, cb: (...args: unknown[]) => void) => void;
-  widget_manager?: { get_model?: (id: string) => Promise<AnyModel> };
+  widget_manager?: {
+    get_model?: (id: string) => Promise<AnyModel>;
+    create_view?: (model: AnyModel) => Promise<{ el: HTMLElement; remove?: () => void }>;
+  };
   model_id?: string;
+}
+
+/** The static-export host injected into a widget's render args (`{model, el, host}`). */
+export interface Host {
+  renderChild?: (ref: string, el: HTMLElement) => Promise<(() => void) | void>;
+}
+
+/** A widget's render arguments — `host` is present only under static export. */
+export interface RenderArgs {
+  model: AnyModel;
+  host?: Host;
 }
 
 /** `model.save_changes()` is a no-op when there is no kernel (static export). */
@@ -247,6 +261,60 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
       },
     );
   });
+}
+
+// ── Child rendering (layout widgets) ─────────────────────────────────────────
+
+const noop = (): void => {};
+
+/**
+ * Render a referenced child widget into `el`, returning a dispose function.
+ * The live-vs-static split lives here (mirroring {@link resolveModel}) so layout
+ * widgets stay simple:
+ *
+ * - **Static export:** delegate to the plugin's `host.renderChild` (v0.2.0+),
+ *   which loads the child's bundled `_esm`, injects its `_css`, and renders it.
+ * - **Live kernel:** create a view via the widget manager and mount its element.
+ *
+ * @param args  The widget's render args (`{ model, host }`) — `host` is present
+ *              only under static export.
+ * @param ref   The child reference: an `IPY_MODEL_<id>` string (static) or a
+ *              resolved child model (live).
+ */
+export async function renderChild(
+  args: RenderArgs,
+  ref: string | AnyModel,
+  el: HTMLElement,
+): Promise<() => void> {
+  // Static export: the plugin host owns child loading + CSS + lifecycle.
+  if (args.host && typeof args.host.renderChild === "function") {
+    const dispose = await args.host.renderChild(ref as string, el);
+    return typeof dispose === "function" ? dispose : noop;
+  }
+
+  // Live kernel: build a view through the widget manager and mount it.
+  const wm = args.model.widget_manager;
+  if (!wm || typeof wm.create_view !== "function") {
+    throw new Error(
+      "[manywidgets] renderChild needs a static host or a widget_manager with create_view",
+    );
+  }
+  let child: AnyModel;
+  if (typeof ref === "string") {
+    if (!wm.get_model) throw new Error("[manywidgets] widget_manager has no get_model");
+    child = await wm.get_model(stripIpy(ref));
+  } else {
+    child = ref;
+  }
+  const view = await wm.create_view(child);
+  el.appendChild(view.el);
+  return () => {
+    try {
+      view.remove?.();
+    } catch {
+      // best-effort teardown
+    }
+  };
 }
 
 // ── Shadow-DOM-safe CSS injection ────────────────────────────────────────────

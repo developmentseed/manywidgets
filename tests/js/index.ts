@@ -9,7 +9,10 @@
 
 export interface FakeModel {
   model_id?: string;
-  widget_manager?: { get_model?: (id: string) => Promise<unknown> };
+  widget_manager?: {
+    get_model?: (id: string) => Promise<unknown>;
+    create_view?: (model: unknown) => Promise<{ el: HTMLElement; remove?: () => void }>;
+  };
   get(key: string): unknown;
   set(key: string, value: unknown): void;
   on(event: string, fn: (...a: unknown[]) => void): void;
@@ -24,7 +27,10 @@ export interface FakeModel {
 export interface FakeModelOptions {
   /** Split space-separated event names in on/off (live Backbone). Default false. */
   splitEvents?: boolean;
-  widget_manager?: { get_model?: (id: string) => Promise<unknown> };
+  widget_manager?: {
+    get_model?: (id: string) => Promise<unknown>;
+    create_view?: (model: unknown) => Promise<{ el: HTMLElement; remove?: () => void }>;
+  };
   model_id?: string;
 }
 
@@ -77,6 +83,41 @@ export function mountEl(): HTMLElement {
   const el = document.createElement("div");
   document.body.appendChild(el);
   return el;
+}
+
+// ── Static-export host (for renderChild / layout tests) ──────────────────────
+
+export interface FakeHost {
+  renderChild(ref: string, el: HTMLElement): Promise<() => void>;
+  /** refs passed to renderChild, in call order. */
+  readonly mounted: string[];
+  /** number of dispose() calls made on returned cleanups. */
+  readonly disposed: number;
+}
+
+/**
+ * A fake static-export `host` whose `renderChild` writes a `[ref]` marker into
+ * the target element (with `data-child=<ref>`) and returns a dispose spy. Lets
+ * layout-widget tests assert child order, placement, and cleanup without a real
+ * plugin runtime.
+ */
+export function fakeHost(): FakeHost {
+  const mounted: string[] = [];
+  let disposed = 0;
+  return {
+    mounted,
+    get disposed() {
+      return disposed;
+    },
+    async renderChild(ref, el) {
+      mounted.push(ref);
+      el.setAttribute("data-child", ref);
+      el.textContent = `[${ref}]`;
+      return () => {
+        disposed += 1;
+      };
+    },
+  };
 }
 
 // ── Static-export host registry (for resolveModel tests) ─────────────────────

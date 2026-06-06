@@ -1,12 +1,21 @@
 # Notes for `myst-anywidget-static-export`
 
-Findings from building `manywidgets` against the released plugin
-([developmentseed/myst-anywidget-static-export](https://github.com/developmentseed/myst-anywidget-static-export),
-v0.1.0). These are suggestions for the **plugin** repo — `manywidgets` already
-works around #1 internally, so nothing here blocks using the current release.
-Line references are against the v0.1.0 source tree.
+Findings from building `manywidgets` against
+[developmentseed/myst-anywidget-static-export](https://github.com/developmentseed/myst-anywidget-static-export).
 
-## 1. Space-separated event names silently never fire (the real bug)
+> **Status — addressed in plugin v0.2.0.** §1 (space-separated event names) and §4
+> (container renderer hook → `host.renderChild`) both **shipped in v0.2.0**;
+> `manywidgets` pins that release. §1's line references below are against the
+> original v0.1.0 tree (historical). §4 records the as-built API + deviations. §2/§3
+> remain minor/informational.
+
+## 1. Space-separated event names silently never fire ✅ FIXED in v0.2.0
+
+> **Shipped:** v0.2.0 splits whitespace-separated event names in `on`/`off` on
+> **both** sub-models and root models, and `off` now actually removes listeners
+> (fixing §2 too). `manywidgets` keeps its `onChanges` helper anyway — it's
+> harmless and still correct against any plugin version.
+
 
 Backbone / ipywidgets models accept space-separated event names:
 `model.on("change:a change:b", fn)` registers `fn` for both `change:a` and
@@ -72,64 +81,134 @@ which silently found nothing for root widgets.) A short note in the plugin's
 `resolveModel` (`packages/core/src/index.ts`) does both and can serve as a
 reference.
 
-## 4. Container renderer hook (enables widget layout) — feature request
+## 4. Container renderer hook (enables widget layout) ✅ SHIPPED in v0.2.0
 
-Today there is no way to lay out multiple widgets in static export:
+> **Shipped (as-built deviations from the spec below):**
+> - **Runtime-only.** No transform changes and the plugin does **not** read
+>   `_myst_child_traits`. Children render because they're reachable submodels via
+>   the container's `widget_serialization` `children` trait (existing
+>   `buildSubModels` BFS bundles their `_esm`/`_css` inline). `manywidgets` still
+>   sets `_myst_child_traits` as a forward-compatible convention.
+> - **API:** `host.renderChild(ref, el): Promise<dispose>` — resolves via
+>   `waitForModel` (normalizes `IPY_MODEL_`/`anywidget:`), Blob-imports the child
+>   `_esm` (cached), injects child `_css` into the current shadow root, runs
+>   `initialize?`/`render`, returns the child's cleanup. Reentrant (nesting works).
+>   `host` is on the render args (`render({model, el, host})`).
+> - **`host.getWidget` does NOT resolve children** — only `getModel`/`waitForModel`/
+>   `renderChild` do. Use `renderChild` for children.
+>
+> The original contract below is retained for context.
+
+This is the spec for a cross-repo contract: a plugin capability that lets one
+anywidget **render other anywidgets inside its own DOM**, so a layout widget
+(`Row`/`Column`/`Grid`) can arrange children — side-by-side, still linked, with no
+kernel. `manywidgets` ships the layout widgets once the plugin exposes the hook.
+
+### Why it's needed
 
 - ipywidgets `VBox`/`HBox`/`GridBox` are **unwrapped to their first anywidget
-  descendant** (Hack #1), so siblings are dropped and layout is lost — `HBox([a, b])`
-  renders only `a`.
+  descendant** (Hack #1), so siblings are dropped and layout is lost —
+  `HBox([a, b])` renders only `a`.
 - A **custom container anywidget can't render its children either**: a child
-  referenced only inside a container is registered as a *state-only* `SubModel`
-  (via `widget_manager.get_model`), not as a renderable widget. `getWidget(ref)`
-  only resolves widgets that had a wrapper module emitted (i.e. top-level outputs),
-  so a container has no way to mount its children.
+  referenced only inside a container becomes a *state-only* `SubModel` (via
+  `widget_manager.get_model`), never a renderable widget. `getWidget(ref)` only
+  resolves widgets that had a wrapper module emitted (i.e. top-level outputs), so a
+  container has no way to mount its children.
 
 The design notes already flag the fix ("expose a hook for a container renderer
-that mounts each anywidget child individually"). Concretely, two changes would
-unlock generic layout:
+that mounts each anywidget child individually"). Below is a concrete contract.
 
-1. **Emit render bindings for referenced anywidget children.** When a top-level
-   output is an anywidget whose state references other anywidget models (e.g. via a
-   `children` trait or any `IPY_MODEL_` ref), emit a wrapper module + register a
-   binding (`registerBinding`, so `getWidget` resolves them) for each referenced
-   anywidget — not just a state proxy. Guard against double-rendering them as their
-   own top-level outputs.
-2. **Expose a child-render API on `host`.** Add e.g.
-   `host.renderChild(ref, el): Promise<void>` that resolves the child's binding and
-   model and renders it into `el` (the inverse of the current top-level
-   `renderStaticWidget`). It builds directly on the existing `getWidget` / `getModel`
-   registry methods (`src/runtime/registry.ts`).
+### Core reframe: anywidget submodels become *renderable*
 
-With those, a container widget's `render({ model, el, host })` can do:
+Today a referenced model is a state-only proxy. The unlock: a referenced model with
+`model_module === "anywidget"` should additionally get its **`_esm` + `_css`
+emitted and a render binding registered** (via `registerBinding`), so
+`getWidget(id)` resolves it — not just `getModel(id)`. That single change is the
+whole mechanism; it is not tied to a magic trait name.
 
-```js
-const ids = model.get("children");           // ["IPY_MODEL_…", …]
-el.style.display = "grid";                    // or flex
-for (const id of ids) {
-  const cell = el.appendChild(document.createElement("div"));
-  await host.renderChild(id, cell);           // mounts the child anywidget here
-}
-```
+### Opt-in, to avoid page bloat
 
-This keeps each child a normal anywidget (so its own JS, CSS, and jslinks work)
-while letting a parent arrange them.
-
-### What manywidgets would ship on top (gated on this hook)
-
-A small family of pure-layout anywidgets — `Row`, `Column`, `Grid` (and a generic
-`Layout`) — each holding child widget refs and a layout spec:
+Making *every* referenced anywidget renderable would emit a wrapper per lonboard
+sub-layer, etc. So gate it: a container **declares its child-ref traits** with a
+marker trait the plugin reads from widget state:
 
 ```python
-Row(slider, chart)                       # side-by-side, linked, coherent
-Grid([[a, b], [c, d]], gap="8px")
+_myst_child_traits = traitlets.List(["children"]).tag(sync=True)
 ```
 
-Python side: `children = traitlets.List(trait=Instance(Widget)).tag(sync=True, **widget_serialization)`
-plus a `layout`/`gap`/`columns` spec. JS side: render each child via
-`host.renderChild`, arranged with CSS grid/flex (static-export-safe by
-construction, following our existing rules). Until the hook lands, manywidgets does
-page-level layout only (grouped notebook cells + MyST `grid`/`embed`).
+The transform only emits render bindings for anywidgets reachable through the trait
+names listed in `_myst_child_traits` of an emitted widget. Lean, explicit, and no
+behaviour change for existing widgets (lonboard `Map`, etc.).
+
+### Plugin changes (transform + runtime)
+
+1. **Transform / emission** (`src/transform/widget-state.ts`, `emit.ts`,
+   `rewrite.ts`): when an emitted anywidget declares `_myst_child_traits`, walk
+   those traits for `IPY_MODEL_` refs; for each referenced model with
+   `model_module === "anywidget"`, emit its wrapper module + assets (`_esm`,
+   `_myst_css_text`/`_myst_css_key`) and `registerBinding` it. Recurse so a child
+   that is itself a container also gets its grandchildren emitted. Don't emit a
+   child as its own top-level output (guard against double render).
+2. **Runtime API** (`src/runtime/registry.ts` / `index.ts`): add
+
+   ```ts
+   host.renderChild(ref: string, el: HTMLElement): Promise<() => void>
+   ```
+
+   It must do the *same* setup the top-level path does:
+   `setupModel(childModel)` (buffer hydrate, `widget_manager` stub, link
+   registration), inject the child's CSS into the current shadow root via
+   `ensureShadowCss(el, child._myst_css_text, child._myst_css_key)`, then call the
+   child's `render({ model, el, host })` and **return its cleanup function**. Build
+   it on the existing `getWidget`/`getModel`. It is the inverse of
+   `renderStaticWidget` and must be reentrant (nested containers).
+
+### Contract surface (what manywidgets depends on)
+
+- A container widget sets `_myst_child_traits` (synced) listing its child-ref traits.
+- Referenced anywidget children are **renderable** (bindings + `_esm` + per-child
+  CSS emitted), recursively.
+- `host.renderChild(ref, el): Promise<dispose>` exists, runs full child setup, and
+  returns a cleanup.
+- Children register in the page registry (so jslinks across them keep working).
+
+### Test fixture for the plugin repo
+
+Add the inverse of the VBox-unwrap test: a notebook whose output is a container
+anywidget (with `_myst_child_traits=["children"]`) referencing **two** anywidget
+children. Assert (a) wrappers/bindings are emitted for *both* children (siblings
+not dropped), (b) per-child CSS is emitted, and (c) a small DOM smoke that
+`renderChild` mounts both into the container. Plus a tiny `docs/` demo proving
+side-by-side render with no kernel.
+
+### Release coordination
+
+The plugin is pinned by release URL in `manywidgets`'s `docs/myst.yml`
+(`…/releases/download/<tag>/plugin.mjs`). Cut a new tagged release after this
+lands; `manywidgets` bumps the URL to pick it up.
+
+### What manywidgets ships on top (gated on this hook)
+
+Pure-layout anywidgets — `Row`, `Column`, `Grid` (and a generic `Layout`):
+
+```python
+Row(slider, chart)                 # side-by-side, linked, coherent
+Grid([[a, b], [c, d]], columns=2, gap="8px")
+```
+
+- **Python:** subclass `BaseWidget`;
+  `children = traitlets.List(trait=Instance(Widget)).tag(sync=True, **widget_serialization)`,
+  `_myst_child_traits = ["children"]`, plus a `gap`/`columns`/`align` spec.
+- **JS:** read child refs, make grid/flex cells, mount each child. Crucially the
+  live-vs-static branch lives in **`@manywidgets/core`**, not the widget — add a
+  `renderChild(model, ref, el)` mirroring `resolveModel`:
+  - **static** → `host.renderChild(ref, el)`
+  - **live kernel** → `await widget_manager.create_view(await get_model(ref))` then
+    mount `view.el`; return `() => view.remove()`
+  So the layout widget's `render` is just `for (ref of children) await renderChild(model, ref, cell)`.
+- Static-export-safe by construction (vanilla DOM, `onChanges`, no
+  `createRoot`). Until the hook lands, layout is page-level only (grouped notebook
+  cells + MyST `grid`/`embed`).
 
 ---
 

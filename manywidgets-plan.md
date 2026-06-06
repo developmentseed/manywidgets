@@ -110,16 +110,15 @@ complete, copyable unit. Cross-widget tests live at the repo-root `tests/`.
 > with per-widget Python+JS tests, docs pages, and the three guides. Each widget now also owns its docs
 > (`src/manywidgets/<name>/doc.md`), auto-assembled into `docs/widgets/<name>.ipynb` by
 > `scripts/build_widget_docs.py` (API table generated from trait `help=`); generated notebooks are
-> gitignored build artifacts. **Remaining:**
-> - `manywidgets.lonboard` interop widgets (`LayerToggle`, `MapFlyer`, `FilterBinder`) — deferred.
-> - **Layout widgets** (`Row`/`Column`/`Grid`/`Layout`) — **gated on a static-export plugin "container
->   renderer hook"** (ipywidgets `HBox`/`VBox` don't survive static export, and a custom container can't
->   mount children today). The hook + the widget design are specified in
->   `docs/upstream/static-export-plugin-notes.md` §4. Until then, layout is page-level only (grouped cells +
->   MyST `grid`/`embed`).
+> gitignored build artifacts. **Layout widgets** (`Row`/`Column`/`Grid`) are now built on the static-export
+> plugin's `host.renderChild` hook (shipped in plugin **v0.2.0**, pinned in `docs/myst.yml`); children are
+> mounted via `@manywidgets/core`'s `renderChild` (static: `host.renderChild`; live:
+> `widget_manager.create_view`) and stay linked. **Remaining:**
+> - `manywidgets.lonboard` interop widgets (`LayerToggle`, `MapFlyer`, `FilterBinder`) — deferred (next pass).
+> - Optional later: nested-list `Grid` API; a generic `Layout` widget.
 >
-> See `docs/upstream/static-export-plugin-notes.md` for plugin fixes that would remove the per-widget
-> `onChanges` workaround and enable layout widgets.
+> See `docs/upstream/static-export-plugin-notes.md` (§1 + §4 marked SHIPPED in v0.2.0) for the plugin
+> contract history.
 
 ---
 

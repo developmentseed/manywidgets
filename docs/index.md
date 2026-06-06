@@ -38,6 +38,10 @@ pip install "manywidgets[lonboard]"
 **Value displays:** [`Stat`](widgets/stat.ipynb),
 [`NumberDisplay`](widgets/number_display.ipynb), [`Text`](widgets/text.ipynb).
 
+**Layout:** [`Row`](widgets/row.ipynb), [`Column`](widgets/column.ipynb),
+[`Grid`](widgets/grid.ipynb) — arrange widgets side-by-side while keeping them
+linked, live and in static export.
+
 **Linking:** `Binder` — link a widget's trait into another with a transform or
 nested path (see the [linking guide](guides/linking.md)).
 

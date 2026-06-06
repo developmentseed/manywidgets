@@ -1,0 +1,7 @@
+.manywidgets-row {
+  margin: 10px 0;
+}
+
+.manywidgets-row__cell {
+  min-width: 0;
+}

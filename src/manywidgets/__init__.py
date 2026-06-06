@@ -15,10 +15,13 @@ from ._version import __version__
 from .binder import Binder
 from .button import Button
 from .chart import Chart
+from .column import Column
 from .dropdown import Dropdown
+from .grid import Grid
 from .number_display import NumberDisplay
 from .number_input import NumberInput
 from .range_slider import RangeSlider
+from .row import Row
 from .slider import Slider
 from .stat import Stat
 from .text import Text
@@ -29,10 +32,13 @@ __all__ = [
     "Binder",
     "Button",
     "Chart",
+    "Column",
     "Dropdown",
+    "Grid",
     "NumberDisplay",
     "NumberInput",
     "RangeSlider",
+    "Row",
     "Slider",
     "Stat",
     "Text",

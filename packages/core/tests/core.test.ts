@@ -2,11 +2,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   asNumber,
   onChanges,
+  renderChild,
   resolveModel,
   safeSaveChanges,
   setByPath,
 } from "@manywidgets/core";
-import { fakeModel, installHostRegistry } from "@manywidgets/test-utils";
+import { fakeHost, fakeModel, installHostRegistry, mountEl } from "@manywidgets/test-utils";
 
 describe("asNumber", () => {
   it("coerces and falls back", () => {
@@ -96,5 +97,39 @@ describe("resolveModel (live kernel)", () => {
     });
     const handle = await resolveModel(caller as never, "anything");
     expect(handle.get("value")).toBe(11);
+  });
+});
+
+describe("renderChild", () => {
+  it("static: delegates to host.renderChild and returns its dispose", async () => {
+    const host = fakeHost();
+    const el = mountEl();
+    const dispose = await renderChild({ model: fakeModel({}), host } as never, "IPY_MODEL_x", el);
+    expect(host.mounted).toEqual(["IPY_MODEL_x"]);
+    expect(el.getAttribute("data-child")).toBe("IPY_MODEL_x");
+    dispose();
+    expect(host.disposed).toBe(1);
+  });
+
+  it("live: creates a view via widget_manager and mounts it", async () => {
+    const view = { el: document.createElement("span"), remove: vi.fn() };
+    const child = fakeModel({ value: 1 });
+    const create_view = vi.fn(async () => view);
+    const get_model = vi.fn(async () => child);
+    const model = fakeModel({}, { widget_manager: { get_model, create_view } });
+    const el = mountEl();
+
+    const dispose = await renderChild({ model } as never, "IPY_MODEL_y", el);
+    expect(get_model).toHaveBeenCalledWith("y"); // IPY_MODEL_ stripped
+    expect(create_view).toHaveBeenCalledWith(child);
+    expect(el.contains(view.el)).toBe(true);
+    dispose();
+    expect(view.remove).toHaveBeenCalled();
+  });
+
+  it("throws when neither a host nor a widget_manager is available", async () => {
+    await expect(
+      renderChild({ model: fakeModel({}) } as never, "IPY_MODEL_z", mountEl()),
+    ).rejects.toThrow();
   });
 });

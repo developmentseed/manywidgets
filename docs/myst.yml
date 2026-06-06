@@ -19,7 +19,7 @@ project:
   # NO code dependency on it. (CI may pre-download this to docs/plugin.mjs and
   # reference it locally; see .github/workflows/deploy.yml.)
   plugins:
-    - https://github.com/developmentseed/myst-anywidget-static-export/releases/download/v0.1.0/plugin.mjs
+    - https://github.com/developmentseed/myst-anywidget-static-export/releases/download/v0.2.0/plugin.mjs
   toc:
     - file: index.md
     - title: Widgets
@@ -34,6 +34,11 @@ project:
         - file: widgets/stat.ipynb
         - file: widgets/number_display.ipynb
         - file: widgets/text.ipynb
+    - title: Layout
+      children:
+        - file: widgets/row.ipynb
+        - file: widgets/column.ipynb
+        - file: widgets/grid.ipynb
     - title: Guides
       children:
         - file: guides/linking.md

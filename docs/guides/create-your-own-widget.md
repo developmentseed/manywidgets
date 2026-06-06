@@ -89,6 +89,39 @@ via the `myst-anywidget-static-export` plugin. To stay compatible:
    widgets by `widget_id` and fans writes out to sub-model proxies, handling the
    live-kernel and static-export cases.
 
+## 3b. Container widgets (laying out children)
+
+A widget can render *other* widgets inside its own DOM — that's how `Row`,
+`Column`, and `Grid` work. Two pieces:
+
+- **Python:** hold children as widget references and mark the trait:
+
+  ```python
+  from ipywidgets import Widget, widget_serialization
+
+  children = traitlets.List(trait=traitlets.Instance(Widget)).tag(sync=True, **widget_serialization)
+  _myst_child_traits = traitlets.List(["children"]).tag(sync=True)
+  ```
+
+  `widget_serialization` serialises each child to an `IPY_MODEL_<id>` ref, so the
+  static export bundles it as a renderable submodel.
+
+- **JS:** mount each child with `renderChild` from core (it picks the static
+  `host.renderChild` path or the live `widget_manager` path for you):
+
+  ```js
+  import { renderChild } from "@manywidgets/core";
+  const cleanups = [];
+  for (const ref of model.get("children") || []) {
+    const cell = container.appendChild(document.createElement("div"));
+    cleanups.push(await renderChild(args, ref, cell)); // pass the whole render args
+  }
+  return () => cleanups.forEach((d) => d());
+  ```
+
+Children keep their own JS, CSS, and links. Requires plugin v0.2.0+ for static
+export. Test with the `fakeHost()` helper from `@manywidgets/test-utils`.
+
 ## 4. Tests
 
 Write both:

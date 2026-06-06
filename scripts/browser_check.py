@@ -169,15 +169,15 @@ def main() -> int:
             if after["chartHeight"] != "460px":
                 failures.append(f"jsdlink failed: chart height = {after['chartHeight']} (expected 460px)")
 
-            # 5. Binder: width slider -> chart width = value*100 + 200
-            ok = page.evaluate(SET_SLIDER, ["Width", 5])
+            # 5. Binder: width slider -> chart width = value*40 + 200
+            ok = page.evaluate(SET_SLIDER, ["Width", 10])
             if not ok:
                 failures.append("could not find 'Width' slider")
             page.wait_for_timeout(800)
             after = page.evaluate(PROBE)
-            print("after width=5:", after["chartWidth"])
-            if after["chartWidth"] != "700px":  # 5*100 + 200
-                failures.append(f"Binder failed: chart width = {after['chartWidth']} (expected 700px)")
+            print("after width=10:", after["chartWidth"])
+            if after["chartWidth"] != "600px":  # 10*40 + 200
+                failures.append(f"Binder failed: chart width = {after['chartWidth']} (expected 600px)")
 
             # 6. controls/displays all rendered on the demo page (markdown Text is
             #    covered by the /text/ page check + vitest, not the demo).
@@ -188,16 +188,18 @@ def main() -> int:
                 if not state[key]:
                     failures.append(f"missing widget: {key}")
 
-            # 7. Button -> Stat jsdlink
-            before_stat = state["statValue"]
+            # 7. Button -> Stat jsdlink (read the "Clicks" stat specifically — the
+            #    metric grid adds other Stats to the page). This also exercises a
+            #    jslink across two children rendered inside layout widgets.
+            before_stat = page.evaluate(STAT_VALUE, "Clicks")
             if not page.evaluate(CLICK_BUTTON):
                 failures.append("could not find Button to click")
             page.wait_for_timeout(600)
-            after2 = page.evaluate(PROBE)
-            print(f"stat value: {before_stat} -> {after2['statValue']}")
-            if after2["statValue"] == before_stat:
+            after_clicks = page.evaluate(STAT_VALUE, "Clicks")
+            print(f"Clicks stat: {before_stat} -> {after_clicks}")
+            if after_clicks == before_stat:
                 failures.append(
-                    f"Button->Stat jsdlink failed: stat value unchanged ({after2['statValue']})"
+                    f"Button->Stat jsdlink failed: Clicks stat unchanged ({after_clicks})"
                 )
 
             if errors:
@@ -216,6 +218,10 @@ def main() -> int:
                 "/stat/": ".manywidgets-stat",
                 "/number-display/": ".manywidgets-numberdisplay__value",
                 "/text/": ".manywidgets-text",
+                # Layout pages: assert the container rendered a real child inside it.
+                "/row/": ".manywidgets-row .manywidgets-stat",
+                "/column/": ".manywidgets-column .manywidgets-numberdisplay__value",
+                "/grid/": ".manywidgets-grid .manywidgets-stat",
             }
             for path, selector in widget_pages.items():
                 wp = browser.new_page()
@@ -246,6 +252,26 @@ def main() -> int:
             finally:
                 sp.close()
 
+            # 10. Layout cross-child link: on /row/ the Slider child drives the Stat
+            #     child (both mounted via renderChild inside one Row), with no kernel.
+            rp = browser.new_page()
+            try:
+                rp.goto(f"http://127.0.0.1:{port}/row/", wait_until="networkidle")
+                rp.wait_for_selector(".myst-anywidget", timeout=15000)
+                rp.wait_for_timeout(1500)
+                in_row = rp.evaluate(SELECTOR_EXISTS, ".manywidgets-row .manywidgets-slider__input")
+                if not in_row:
+                    failures.append("/row/ did not render a Slider child inside the Row")
+                before_r = rp.evaluate(STAT_VALUE, "Selected")
+                rp.evaluate(SET_SLIDER, ["Value", 73])
+                rp.wait_for_timeout(600)
+                after_r = rp.evaluate(STAT_VALUE, "Selected")
+                print(f"/row/ child link: {before_r} -> {after_r}")
+                if after_r == before_r:
+                    failures.append(f"/row/ Slider->Stat child link did not update ({after_r})")
+            finally:
+                rp.close()
+
             browser.close()
     finally:
         httpd.shutdown()
@@ -256,8 +282,8 @@ def main() -> int:
             print("  -", f)
         return 1
     print("\n✅ STATIC-EXPORT BROWSER CHECK PASSED (no kernel): demo page renders + "
-          "jsdlink/Binder drive the chart; all 10 per-widget doc pages render a live "
-          "widget; the Stat page's Button→Stat link updates.")
+          "jsdlink/Binder drive the chart; every widget doc page (incl. Row/Column/Grid) "
+          "renders a live widget; Stat-page and in-Row child links both update.")
     return 0
 
 
