@@ -7,10 +7,10 @@ and are authored to **render statically (no kernel)** when a notebook is exporte
 with the [`myst-anywidget-static-export`](https://github.com/developmentseed/myst-anywidget-static-export)
 MyST plugin — while remaining ordinary anywidgets in a live kernel.
 
-> **Status:** early. This is the first vertical slice — `Chart`, `Slider`, and
-> `Binder` — proving the package structure, build, and linking story. More
-> widgets (more input controls, value displays, and first-class lonboard interop
-> widgets) are on the way; see `manywidgets-plan.md`.
+> **Status:** early. v1 ships `Chart`, input controls (`Slider`, `RangeSlider`,
+> `Dropdown`, `Toggle`, `Button`, `NumberInput`), value displays (`Stat`,
+> `NumberDisplay`, `Text`), and the `Binder` linking primitive. First-class
+> lonboard interop widgets are the next milestone; see `manywidgets-plan.md`.
 
 ## Install
 
@@ -29,6 +29,17 @@ import numpy as np
 chart = Chart(title="Demo", x_label="x", y_label="y", height=320)
 chart.add_series(x=np.linspace(0, 10, 100), y=np.sin(np.linspace(0, 10, 100)), name="sin")
 chart
+```
+
+## Widgets
+
+```python
+from manywidgets import (
+    Chart,                                   # Chart.js charts
+    Slider, RangeSlider, Dropdown, Toggle, Button, NumberInput,  # input controls
+    Stat, NumberDisplay, Text,               # value displays
+    Binder,                                  # linking with transforms / nested paths
+)
 ```
 
 ## Linking widgets
@@ -67,9 +78,30 @@ into the mount element, vanilla DOM, buffer-free core widgets, link via
 npm install
 npm run build          # esbuild every widget src/index.ts -> dist/widget.js
 npm run typecheck      # tsc --noEmit
+npm test               # vitest (JS unit tests)
 pip install -e ".[dev]"
 pytest
 ```
+
+### Docs
+
+Each widget owns its docs in `src/manywidgets/<name>/doc.md` (prose + a
+`{code-cell}` example + an `{api-table}` placeholder). `npm run docs:gen` builds
+`docs/widgets/<name>.ipynb` from those — auto-generating the API table from trait
+introspection — so the per-widget pages are **generated build artifacts**
+(gitignored), not hand-maintained. Build and view:
+
+```bash
+pip install -e ".[numpy]" ipykernel nbconvert nbformat
+python -m ipykernel install --user --name manywidgets-venv
+npm run docs:gen       # generate docs/widgets/*.ipynb from each widget's doc.md
+jupyter nbconvert --to notebook --execute --inplace docs/examples/*.ipynb docs/widgets/*.ipynb
+cd docs && npx myst build --html && cd ..
+npm run serve          # serve over HTTP at http://localhost:8000 (NOT file://)
+```
+
+> Serve the built site over HTTP — opening the HTML via `file://` breaks asset and
+> widget loading (absolute paths + dynamic `import()`).
 
 Releases are cut by publishing a GitHub Release (CI builds the wheel — with JS
 compiled by the build hook — and publishes to PyPI). The JS bundles are

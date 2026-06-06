@@ -40,25 +40,35 @@ class Chart(BaseWidget):
     _css = asset(__file__, "style.css")
 
     # Data / type
-    chart_type = traitlets.Unicode("line").tag(sync=True)
-    series_data = traitlets.List([]).tag(sync=True)
-    chart_options = traitlets.Dict({}).tag(sync=True)
+    chart_type = traitlets.Unicode(
+        "line", help="Default series type (line, scatter, bar, …)."
+    ).tag(sync=True)
+    series_data = traitlets.List(
+        [], help="The chart series (use add_series/update_series/clear_series)."
+    ).tag(sync=True)
+    chart_options = traitlets.Dict(
+        {}, help="Extra Chart.js options, deep-merged into the defaults."
+    ).tag(sync=True)
 
     # Layout / labels
-    width = traitlets.Int(800).tag(sync=True)
-    height = traitlets.Int(400).tag(sync=True)
-    title = traitlets.Unicode("").tag(sync=True)
-    x_label = traitlets.Unicode("").tag(sync=True)
-    y_label = traitlets.Unicode("").tag(sync=True)
+    width = traitlets.Int(800, help="Width in pixels.").tag(sync=True)
+    height = traitlets.Int(400, help="Height in pixels.").tag(sync=True)
+    title = traitlets.Unicode("", help="Chart title.").tag(sync=True)
+    x_label = traitlets.Unicode("", help="X-axis title.").tag(sync=True)
+    y_label = traitlets.Unicode("", help="Y-axis title.").tag(sync=True)
 
     # Presentation toggles
-    animation_enabled = traitlets.Bool(True).tag(sync=True)
-    tooltips_enabled = traitlets.Bool(True).tag(sync=True)
-    legend_enabled = traitlets.Bool(True).tag(sync=True)
+    animation_enabled = traitlets.Bool(True, help="Animate chart updates.").tag(sync=True)
+    tooltips_enabled = traitlets.Bool(True, help="Show hover tooltips.").tag(sync=True)
+    legend_enabled = traitlets.Bool(True, help="Show the legend.").tag(sync=True)
 
     # Interaction state (written from JS on click/hover)
-    clicked_point = traitlets.Dict({}).tag(sync=True)
-    hover_point = traitlets.Dict({}).tag(sync=True)
+    clicked_point = traitlets.Dict(
+        {}, help="Written from JS on click: {series, index, x, y, label}."
+    ).tag(sync=True)
+    hover_point = traitlets.Dict(
+        {}, help="Written from JS on hover: {series, index, x, y, label}."
+    ).tag(sync=True)
 
     def add_series(
         self,

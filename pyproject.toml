@@ -29,6 +29,9 @@ numpy = ["numpy"]
 dev = [
     "pytest>=8",
     "numpy",
+    "nbformat",
+    "nbconvert",
+    "ipykernel",
 ]
 
 [project.urls]
@@ -41,6 +44,8 @@ path = "src/manywidgets/_version.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/manywidgets"]
+# Per-widget tests are self-contained in each widget's tests/ dir; don't ship them.
+exclude = ["src/manywidgets/**/tests/**"]
 # Built JS is gitignored but must ship in the wheel.
 artifacts = [
     "src/manywidgets/**/dist/widget.js",
@@ -66,14 +71,30 @@ include = [
 dependencies = ["hatch-jupyter-builder>=0.9"]
 build-function = "hatch_jupyter_builder.npm_builder"
 ensured-targets = [
-    "src/manywidgets/chart/dist/widget.js",
-    "src/manywidgets/slider/dist/widget.js",
     "src/manywidgets/binder/dist/widget.js",
+    "src/manywidgets/button/dist/widget.js",
+    "src/manywidgets/chart/dist/widget.js",
+    "src/manywidgets/dropdown/dist/widget.js",
+    "src/manywidgets/number_display/dist/widget.js",
+    "src/manywidgets/number_input/dist/widget.js",
+    "src/manywidgets/range_slider/dist/widget.js",
+    "src/manywidgets/slider/dist/widget.js",
+    "src/manywidgets/stat/dist/widget.js",
+    "src/manywidgets/text/dist/widget.js",
+    "src/manywidgets/toggle/dist/widget.js",
 ]
 skip-if-exists = [
-    "src/manywidgets/chart/dist/widget.js",
-    "src/manywidgets/slider/dist/widget.js",
     "src/manywidgets/binder/dist/widget.js",
+    "src/manywidgets/button/dist/widget.js",
+    "src/manywidgets/chart/dist/widget.js",
+    "src/manywidgets/dropdown/dist/widget.js",
+    "src/manywidgets/number_display/dist/widget.js",
+    "src/manywidgets/number_input/dist/widget.js",
+    "src/manywidgets/range_slider/dist/widget.js",
+    "src/manywidgets/slider/dist/widget.js",
+    "src/manywidgets/stat/dist/widget.js",
+    "src/manywidgets/text/dist/widget.js",
+    "src/manywidgets/toggle/dist/widget.js",
 ]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
@@ -81,4 +102,8 @@ npm = "npm"
 build_cmd = "build"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# Discover cross-widget tests at the repo root AND each widget's self-contained
+# tests under src/manywidgets/<name>/tests/. importlib mode avoids same-basename
+# import clashes (a copied widget dir may keep its test_<name>.py).
+testpaths = ["tests", "src/manywidgets"]
+addopts = "--import-mode=importlib"

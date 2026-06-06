@@ -6,20 +6,36 @@ authored to also render correctly when statically exported (no kernel) via the
 ``jsdlink`` for the simple cases, or the :class:`~manywidgets.Binder` widget for
 transforms and nested-path targets that jslink can't express.
 
-The optional ``manywidgets.lonboard`` subpackage ships first-class lonboard
-interop widgets and is import-guarded (``pip install manywidgets[lonboard]``).
+The optional ``manywidgets.lonboard`` subpackage (first-class lonboard interop
+widgets) is planned for a future release.
 """
 
 from ._base import BaseWidget
 from ._version import __version__
 from .binder import Binder
+from .button import Button
 from .chart import Chart
+from .dropdown import Dropdown
+from .number_display import NumberDisplay
+from .number_input import NumberInput
+from .range_slider import RangeSlider
 from .slider import Slider
+from .stat import Stat
+from .text import Text
+from .toggle import Toggle
 
 __all__ = [
     "BaseWidget",
     "Binder",
+    "Button",
     "Chart",
+    "Dropdown",
+    "NumberDisplay",
+    "NumberInput",
+    "RangeSlider",
     "Slider",
+    "Stat",
+    "Text",
+    "Toggle",
     "__version__",
 ]

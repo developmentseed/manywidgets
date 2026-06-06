@@ -1,0 +1,28 @@
+.manywidgets-number {
+  padding: 10px 14px;
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+  background: #ffffff;
+  max-width: 320px;
+  margin: 10px 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, sans-serif;
+  box-sizing: border-box;
+  display: grid;
+  gap: 6px;
+}
+
+.manywidgets-number__label {
+  color: #24292e;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.manywidgets-number__input {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 14px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  box-sizing: border-box;
+}

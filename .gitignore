@@ -21,6 +21,9 @@ docs/plugin.mjs
 # Sidecar widget assets emitted next to notebooks by the static-export plugin
 **/_widget_assets/
 .ipynb_checkpoints/
+# Per-widget doc notebooks are generated from src/manywidgets/<name>/doc.md
+# (scripts/build_widget_docs.py) — build artifacts, not source.
+docs/widgets/*.ipynb
 
 # OS
 .DS_Store

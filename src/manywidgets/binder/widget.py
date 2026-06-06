@@ -46,13 +46,15 @@ class Binder(BaseWidget):
 
     _esm = asset(__file__, "dist", "widget.js")
 
-    source_widget_id = traitlets.Unicode("").tag(sync=True)
-    source_field = traitlets.Unicode("value").tag(sync=True)
-    target_widget_id = traitlets.Unicode("").tag(sync=True)
-    target_field = traitlets.Unicode("").tag(sync=True)
-    multiplier = traitlets.Float(1.0).tag(sync=True)
-    offset = traitlets.Float(0.0).tag(sync=True)
-    label = traitlets.Unicode("").tag(sync=True)
+    source_widget_id = traitlets.Unicode("", help="widget_id of the source widget.").tag(sync=True)
+    source_field = traitlets.Unicode("value", help="Source trait to read.").tag(sync=True)
+    target_widget_id = traitlets.Unicode("", help="widget_id of the target widget.").tag(sync=True)
+    target_field = traitlets.Unicode(
+        "", help="Target trait/dotted-path to write (e.g. 'view_state.zoom')."
+    ).tag(sync=True)
+    multiplier = traitlets.Float(1.0, help="Linear transform multiplier.").tag(sync=True)
+    offset = traitlets.Float(0.0, help="Linear transform offset.").tag(sync=True)
+    label = traitlets.Unicode("", help="Optional status label.").tag(sync=True)
 
     def __init__(
         self,

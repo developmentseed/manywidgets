@@ -31,14 +31,23 @@ jobs:
       - run: npm ci
       - run: npm run build # widget dist/widget.js (embedded into widget state on execute)
 
-      # Install the package + a kernel so the example notebook can be executed.
-      - run: pip install -e . ipykernel nbconvert
+      # Install the package + a kernel so the example notebooks can be executed.
+      # numpy is needed by the Chart examples (it's an optional extra); nbformat
+      # for the doc generator.
+      - run: pip install -e ".[numpy]" ipykernel nbconvert nbformat
       - run: python -m ipykernel install --user --name manywidgets-venv
 
-      # Re-execute the example notebook so the captured widget state (incl. the
-      # built _esm) is current. nbclient stores widget state into metadata.widgets.
-      - name: Pre-execute example notebooks
-        run: jupyter nbconvert --to notebook --execute --inplace docs/examples/*.ipynb
+      # Generate the per-widget doc notebooks from each widget's co-located
+      # doc.md (+ auto API table from trait introspection). These are build
+      # artifacts (gitignored), so generate them here before executing.
+      - name: Generate widget doc notebooks
+        run: npm run docs:gen
+
+      # Re-execute the example + per-widget notebooks so the captured widget state
+      # (incl. the built _esm) is current. nbclient stores widget state into
+      # metadata.widgets, which the static-export plugin needs to render widgets.
+      - name: Pre-execute notebooks
+        run: jupyter nbconvert --to notebook --execute --inplace docs/examples/*.ipynb docs/widgets/*.ipynb
 
       - uses: actions/configure-pages@v5
 

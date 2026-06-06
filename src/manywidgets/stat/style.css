@@ -1,0 +1,55 @@
+.manywidgets-stat {
+  display: inline-block;
+  min-width: 140px;
+  padding: 14px 18px;
+  border: 1px solid #e1e4e8;
+  border-radius: 10px;
+  background: #ffffff;
+  margin: 10px 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, sans-serif;
+}
+
+.manywidgets-stat__label {
+  color: #586069;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.manywidgets-stat__value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.manywidgets-stat__value {
+  font-size: 30px;
+  font-weight: 700;
+  color: #24292e;
+  font-variant-numeric: tabular-nums;
+}
+
+.manywidgets-stat__unit {
+  font-size: 14px;
+  color: #586069;
+}
+
+.manywidgets-stat__delta {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.manywidgets-stat__delta--up {
+  color: #1a7f37;
+}
+.manywidgets-stat__delta--down {
+  color: #cf222e;
+}
+.manywidgets-stat__delta--flat {
+  color: #586069;
+}

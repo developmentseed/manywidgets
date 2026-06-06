@@ -13,9 +13,9 @@ kernel** (via the [`myst-anywidget-static-export`](https://github.com/developmen
 MyST plugin).
 
 ```{note}
-This is the first vertical slice: `Chart`, `Slider`, and `Binder`. It proves the
-package structure, the esbuild build, and the linking story. More widgets are on
-the way.
+v1 ships a `Chart`, a set of input controls and value displays, and the `Binder`
+linking primitive. First-class lonboard interop widgets are planned for a future
+release.
 ```
 
 ## Install
@@ -28,9 +28,18 @@ pip install "manywidgets[lonboard]"
 
 ## Widgets
 
-- [`Chart`](widgets/chart.md) — interactive Chart.js charts.
-- `Slider` — a labelled numeric range slider that drives other widgets.
-- `Binder` — link a widget's trait into another with a transform or nested path.
+- [`Chart`](widgets/chart.ipynb) — interactive Chart.js charts.
+
+**Input controls:** [`Slider`](widgets/slider.ipynb),
+[`RangeSlider`](widgets/range_slider.ipynb), [`Dropdown`](widgets/dropdown.ipynb),
+[`Toggle`](widgets/toggle.ipynb), [`Button`](widgets/button.ipynb),
+[`NumberInput`](widgets/number_input.ipynb).
+
+**Value displays:** [`Stat`](widgets/stat.ipynb),
+[`NumberDisplay`](widgets/number_display.ipynb), [`Text`](widgets/text.ipynb).
+
+**Linking:** `Binder` — link a widget's trait into another with a transform or
+nested path (see the [linking guide](guides/linking.md)).
 
 ## Linking
 

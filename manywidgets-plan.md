@@ -91,13 +91,35 @@ manywidgets/
 │   ├── widgets/<name>.md          # one standardized page per widget (template below)
 │   ├── guides/{linking.md, create-your-own-widget.md, static-export.md}
 │   └── examples/                  # ambitious multi-widget notebooks (later milestone)
-├── tests/test_widgets.py          # pytest: import, traits, jslink build, Binder id-extraction
+├── tests/                         # cross-widget integration tests (test_integration.py)
+│   └── js/index.ts                # shared JS test helper (strict static-like fakeModel)
+│   # Per-widget tests are SELF-CONTAINED inside each widget dir:
+│   #   src/manywidgets/<name>/tests/test_<name>.py  (pytest)
+│   #   src/manywidgets/<name>/tests/<name>.test.ts  (vitest + jsdom)
 ├── README.md  LICENSE  .gitignore
 └── .github/workflows/{test.yml, release.yml, deploy.yml}
 ```
 
 Each widget directory mirrors `typed_counter` exactly: `widget.py` (`_esm = parent/"dist"/"widget.js"`,
-`_css = parent/"style.css"`), `src/index.ts`, built `dist/widget.js`, `style.css`, `__init__.py`.
+`_css = parent/"style.css"`), `src/index.ts`, built `dist/widget.js`, `style.css`, `__init__.py` — **plus a
+self-contained `tests/` dir** (`test_<name>.py` for pytest, `<name>.test.ts` for vitest) so a widget is a
+complete, copyable unit. Cross-widget tests live at the repo-root `tests/`.
+
+> **Progress (this build):** `Chart`, `Slider`, `Binder`, and all v1 controls/displays
+> (`RangeSlider`, `Dropdown`, `Toggle`, `Button`, `NumberInput`, `Stat`, `NumberDisplay`, `Text`) are built
+> with per-widget Python+JS tests, docs pages, and the three guides. Each widget now also owns its docs
+> (`src/manywidgets/<name>/doc.md`), auto-assembled into `docs/widgets/<name>.ipynb` by
+> `scripts/build_widget_docs.py` (API table generated from trait `help=`); generated notebooks are
+> gitignored build artifacts. **Remaining:**
+> - `manywidgets.lonboard` interop widgets (`LayerToggle`, `MapFlyer`, `FilterBinder`) — deferred.
+> - **Layout widgets** (`Row`/`Column`/`Grid`/`Layout`) — **gated on a static-export plugin "container
+>   renderer hook"** (ipywidgets `HBox`/`VBox` don't survive static export, and a custom container can't
+>   mount children today). The hook + the widget design are specified in
+>   `docs/upstream/static-export-plugin-notes.md` §4. Until then, layout is page-level only (grouped cells +
+>   MyST `grid`/`embed`).
+>
+> See `docs/upstream/static-export-plugin-notes.md` for plugin fixes that would remove the per-widget
+> `onChanges` workaround and enable layout widgets.
 
 ---
 

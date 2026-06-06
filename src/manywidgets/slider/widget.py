@@ -18,8 +18,8 @@ class Slider(BaseWidget):
     _esm = asset(__file__, "dist", "widget.js")
     _css = asset(__file__, "style.css")
 
-    value = traitlets.Float(0.0).tag(sync=True)
-    min = traitlets.Float(0.0).tag(sync=True)
-    max = traitlets.Float(100.0).tag(sync=True)
-    step = traitlets.Float(1.0).tag(sync=True)
-    label = traitlets.Unicode("").tag(sync=True)
+    value = traitlets.Float(0.0, help="Current value.").tag(sync=True)
+    min = traitlets.Float(0.0, help="Minimum value.").tag(sync=True)
+    max = traitlets.Float(100.0, help="Maximum value.").tag(sync=True)
+    step = traitlets.Float(1.0, help="Step size.").tag(sync=True)
+    label = traitlets.Unicode("", help="Label shown above the slider.").tag(sync=True)

@@ -48,7 +48,9 @@ class BaseWidget(anywidget.AnyWidget):
     structure.
     """
 
-    widget_id = traitlets.Unicode().tag(sync=True)
+    widget_id = traitlets.Unicode(
+        help="Stable unique id used for cross-widget linking (auto-assigned)."
+    ).tag(sync=True)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

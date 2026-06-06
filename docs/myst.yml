@@ -24,10 +24,21 @@ project:
     - file: index.md
     - title: Widgets
       children:
-        - file: widgets/chart.md
+        - file: widgets/chart.ipynb
+        - file: widgets/slider.ipynb
+        - file: widgets/range_slider.ipynb
+        - file: widgets/dropdown.ipynb
+        - file: widgets/toggle.ipynb
+        - file: widgets/button.ipynb
+        - file: widgets/number_input.ipynb
+        - file: widgets/stat.ipynb
+        - file: widgets/number_display.ipynb
+        - file: widgets/text.ipynb
     - title: Guides
       children:
         - file: guides/linking.md
+        - file: guides/create-your-own-widget.md
+        - file: guides/static-export.md
     - title: Examples
       children:
         - file: examples/demo.ipynb
