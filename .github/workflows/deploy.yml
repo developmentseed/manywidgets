@@ -1,0 +1,65 @@
+name: Deploy docs to Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: npm ci
+      - run: npm run build # widget dist/widget.js (embedded into widget state on execute)
+
+      # Install the package + a kernel so the example notebook can be executed.
+      - run: pip install -e . ipykernel nbconvert
+      - run: python -m ipykernel install --user --name manywidgets-venv
+
+      # Re-execute the example notebook so the captured widget state (incl. the
+      # built _esm) is current. nbclient stores widget state into metadata.widgets.
+      - name: Pre-execute example notebooks
+        run: jupyter nbconvert --to notebook --execute --inplace docs/examples/*.ipynb
+
+      - uses: actions/configure-pages@v5
+
+      # docs/myst.yml references the static-export plugin by release URL, so myst
+      # fetches it at build time — no code dependency on the plugin in this repo.
+      - name: Build MyST site
+        working-directory: docs
+        run: npx myst build --html
+        env:
+          BASE_URL: /manywidgets
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/_build/html
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,84 @@
+[build-system]
+requires = ["hatchling>=1.21", "hatch-jupyter-builder>=0.9"]
+build-backend = "hatchling.build"
+
+[project]
+name = "manywidgets"
+description = "A composable set of anywidget-based widgets for data analysis and geospatial work in notebooks — works well with lonboard, and renders statically (no kernel) via the myst-anywidget-static-export plugin."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Development Seed", email = "sanjay@developmentseed.org" }]
+keywords = ["anywidget", "jupyter", "widgets", "lonboard", "geospatial", "mystmd"]
+classifiers = [
+    "Framework :: Jupyter",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Visualization",
+]
+dynamic = ["version"]
+dependencies = [
+    "anywidget>=0.9",
+    "traitlets>=5",
+    "ipywidgets>=8",
+]
+
+[project.optional-dependencies]
+lonboard = ["lonboard>=0.10"]
+numpy = ["numpy"]
+dev = [
+    "pytest>=8",
+    "numpy",
+]
+
+[project.urls]
+Homepage = "https://github.com/developmentseed/manywidgets"
+Repository = "https://github.com/developmentseed/manywidgets"
+Issues = "https://github.com/developmentseed/manywidgets/issues"
+
+[tool.hatch.version]
+path = "src/manywidgets/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/manywidgets"]
+# Built JS is gitignored but must ship in the wheel.
+artifacts = [
+    "src/manywidgets/**/dist/widget.js",
+    "src/manywidgets/**/style.css",
+]
+
+[tool.hatch.build.targets.sdist]
+artifacts = [
+    "src/manywidgets/**/dist/widget.js",
+]
+include = [
+    "src/manywidgets",
+    "packages",
+    "scripts",
+    "package.json",
+    "package-lock.json",
+    "tsconfig.base.json",
+]
+
+# Build the JS bundles (npm ci && npm run build) when building a wheel/sdist,
+# so distributions always contain the compiled dist/widget.js files.
+[tool.hatch.build.hooks.jupyter-builder]
+dependencies = ["hatch-jupyter-builder>=0.9"]
+build-function = "hatch_jupyter_builder.npm_builder"
+ensured-targets = [
+    "src/manywidgets/chart/dist/widget.js",
+    "src/manywidgets/slider/dist/widget.js",
+    "src/manywidgets/binder/dist/widget.js",
+]
+skip-if-exists = [
+    "src/manywidgets/chart/dist/widget.js",
+    "src/manywidgets/slider/dist/widget.js",
+    "src/manywidgets/binder/dist/widget.js",
+]
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+npm = "npm"
+build_cmd = "build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

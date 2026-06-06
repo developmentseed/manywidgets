@@ -1,0 +1,35 @@
+.manywidgets-slider {
+  padding: 10px 14px;
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+  background: #ffffff;
+  max-width: 320px;
+  margin: 10px 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, sans-serif;
+  box-sizing: border-box;
+}
+
+.manywidgets-slider__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.manywidgets-slider__label {
+  color: #24292e;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.manywidgets-slider__value {
+  color: #0366d6;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.manywidgets-slider__input {
+  width: 100%;
+  accent-color: #0366d6;
+}

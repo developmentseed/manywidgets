@@ -1,0 +1,22 @@
+{
+  "name": "manywidgets",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Build pipeline for the manywidgets anywidget bundles (esbuild over each widget + the shared @manywidgets/core module).",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "clean": "rm -rf src/manywidgets/*/dist"
+  },
+  "devDependencies": {
+    "@anywidget/types": "^0.2.0",
+    "esbuild": "^0.25.0",
+    "mystmd": "^1.8.3",
+    "typescript": "^5.4.0"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.0"
+  }
+}

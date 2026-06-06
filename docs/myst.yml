@@ -1,0 +1,41 @@
+# MyST configuration for the manywidgets docs site.
+# See https://mystmd.org/guide/frontmatter
+version: 1
+project:
+  title: manywidgets
+  description: >-
+    Composable anywidget-based widgets for data analysis and geospatial work in
+    notebooks — works well with lonboard, and renders statically (no kernel) via
+    the myst-anywidget-static-export plugin.
+  github: https://github.com/developmentseed/manywidgets
+  keywords:
+    - anywidget
+    - jupyter
+    - widgets
+    - lonboard
+    - mystmd
+    - static-export
+  # The static-export plugin is referenced by release URL only — manywidgets has
+  # NO code dependency on it. (CI may pre-download this to docs/plugin.mjs and
+  # reference it locally; see .github/workflows/deploy.yml.)
+  plugins:
+    - https://github.com/developmentseed/myst-anywidget-static-export/releases/download/v0.1.0/plugin.mjs
+  toc:
+    - file: index.md
+    - title: Widgets
+      children:
+        - file: widgets/chart.md
+    - title: Guides
+      children:
+        - file: guides/linking.md
+    - title: Examples
+      children:
+        - file: examples/demo.ipynb
+site:
+  template: book-theme
+  nav:
+    - title: GitHub
+      url: https://github.com/developmentseed/manywidgets
+  actions:
+    - title: GitHub
+      url: https://github.com/developmentseed/manywidgets
