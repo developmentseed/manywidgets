@@ -38,5 +38,5 @@ jobs:
           cache: pip
       # Editable install reads dist/widget.js at runtime, so build the JS first.
       - run: npm ci && npm run build
-      - run: pip install -e ".[dev]"
+      - run: pip install -e ".[dev,lonboard]"
       - run: pytest -q
