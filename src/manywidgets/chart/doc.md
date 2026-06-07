@@ -1,7 +1,6 @@
 # Chart
 
-An interactive charting widget powered by [Chart.js](https://www.chartjs.org/)
-(bundled into the widget, so it renders without a CDN or a kernel).
+An interactive charting widget powered by [Chart.js](https://www.chartjs.org/).
 
 ## Import
 
@@ -9,7 +8,7 @@ An interactive charting widget powered by [Chart.js](https://www.chartjs.org/)
 from manywidgets import Chart
 ```
 
-## Minimal example
+## Example
 
 ```{code-cell} python
 import numpy as np
@@ -49,10 +48,3 @@ chart = Chart()
 kind = Dropdown(options=["line", "bar", "scatter"], value="line")
 jsdlink((kind, "value"), (chart, "chart_type"))
 ```
-
-## Caveats (static export)
-
-- Data is plain JSON lists (buffer-free), so static export needs no `nbclient`
-  pre-execute step.
-- Click/hover write through `model.save_changes()`, a safe no-op with no kernel —
-  the chart still renders and is interactive.

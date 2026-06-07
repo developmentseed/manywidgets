@@ -1,7 +1,6 @@
 # Row
 
-Lay out child widgets in a horizontal row. Children stay interactive and linked —
-live and in static export.
+Lay out child widgets in a horizontal row.
 
 ## Import
 
@@ -9,9 +8,9 @@ live and in static export.
 from manywidgets import Row
 ```
 
-## Minimal example
+## Example
 
-A slider beside the `Stat` it drives — side by side, linked, kernel-free:
+A slider beside the `Stat` it drives:
 
 ```{code-cell} python
 from ipywidgets import jsdlink
@@ -28,9 +27,3 @@ Row(s, stat, gap="24px")
 {api-table}
 
 Pass children positionally (`Row(a, b)`) or as a list (`Row(children=[a, b])`).
-
-## Caveats (static export)
-
-Children render via `host.renderChild` (plugin v0.2.0+) — each child loads its own
-JS + CSS and keeps its links. Requires a child to be a manywidgets/anywidget
-instance (referenced through the `children` trait). No kernel needed.

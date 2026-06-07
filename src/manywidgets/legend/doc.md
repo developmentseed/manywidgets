@@ -1,8 +1,6 @@
 # Legend
 
-A discrete colour legend — a swatch + label per entry, with an optional title. Use
-it alongside data-driven styling (pass the same colours you styled with so the
-legend stays consistent).
+A discrete colour legend — a swatch and label per entry, with an optional title.
 
 ## Import
 
@@ -10,7 +8,7 @@ legend stays consistent).
 from manywidgets import Legend
 ```
 
-## Minimal example
+## Example
 
 ```{code-cell} python
 from manywidgets import Legend
@@ -30,9 +28,5 @@ Legend(
 {api-table}
 
 Each entry is `[color, label]`. `color` is an `[r, g, b]` / `[r, g, b, a]` list
-(0–255, deck.gl convention) or a CSS colour string (e.g. `"#e11"`).
-
-## Caveats (static export)
-
-Read-only display — renders with no kernel. Pair it with a styled
-[lonboard](lonboard.ipynb) layer (see the [interop example](../examples/lonboard-map.ipynb)).
+(0–255, deck.gl convention) or a CSS colour string (e.g. `"#e11"`). Pair it with a
+styled lonboard layer — see the [interop example](../examples/lonboard-map.ipynb).

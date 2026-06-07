@@ -1,8 +1,7 @@
 # Column
 
 Lay out child widgets in a vertical column (the vertical sibling of
-[`Row`](row.ipynb)). Children stay interactive and linked — live and in static
-export.
+[`Row`](row.ipynb)).
 
 ## Import
 
@@ -10,7 +9,7 @@ export.
 from manywidgets import Column
 ```
 
-## Minimal example
+## Example
 
 ```{code-cell} python
 from ipywidgets import jsdlink
@@ -27,8 +26,3 @@ Column(s, nd, gap="12px")
 {api-table}
 
 Pass children positionally (`Column(a, b)`) or as a list (`Column(children=[a, b])`).
-
-## Caveats (static export)
-
-Children render via `host.renderChild` (plugin v0.2.0+); each child keeps its own
-JS, CSS, and links, with no kernel.

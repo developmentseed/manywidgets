@@ -8,21 +8,10 @@ A compact metric card: label, value, unit, and an optional signed delta.
 from manywidgets import Stat
 ```
 
-## Minimal example
+## Example
 
-```{code-cell} python
-from manywidgets import Stat
-
-Stat(label="Revenue", value=1234, unit="USD", delta=12)
-```
-
-## API
-
-{api-table}
-
-## Interactive (linked)
-
-`Stat` is read-only — drive it from another widget. Click the button:
+Read-only — drive it from another widget (see the
+[linking guide](../guides/linking.md)). Click the button:
 
 ```{code-cell} python
 from ipywidgets import jsdlink
@@ -34,19 +23,6 @@ jsdlink((btn, "clicks"), (clicks, "value"))
 display(btn, clicks)
 ```
 
-## Linking
+## API
 
-```python
-from ipywidgets import jsdlink
-from manywidgets import Button, Stat
-
-btn = Button(label="+1")
-stat = Stat(label="Clicks")
-jsdlink((btn, "clicks"), (stat, "value"))
-```
-
-See the [linking guide](../guides/linking.md).
-
-## Caveats (static export)
-
-Renders and updates from `jslink`/`Binder` with no kernel.
+{api-table}

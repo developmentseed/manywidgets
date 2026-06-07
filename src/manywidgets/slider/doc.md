@@ -1,6 +1,6 @@
 # Slider
 
-A labelled numeric range slider whose `value` drives other widgets.
+A labelled numeric slider whose `value` drives other widgets.
 
 ## Import
 
@@ -8,7 +8,7 @@ A labelled numeric range slider whose `value` drives other widgets.
 from manywidgets import Slider
 ```
 
-## Minimal example
+## Example
 
 ```{code-cell} python
 from manywidgets import Slider
@@ -32,8 +32,3 @@ slider = Slider(label="Height", min=200, max=600, value=320)
 chart = Chart(title="Linked")
 jsdlink((slider, "value"), (chart, "height"))
 ```
-
-## Caveats (static export)
-
-Writes go through `model.save_changes()`, a safe no-op with no kernel — the slider
-stays interactive and drives `jslink`/`Binder` targets in the browser.

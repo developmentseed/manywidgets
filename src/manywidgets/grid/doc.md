@@ -1,7 +1,7 @@
 # Grid
 
-Lay out child widgets in an N-column CSS grid. Children flow in row-major order
-into `columns` equal columns. Interactive and linked — live and in static export.
+Lay out child widgets in an N-column CSS grid; children flow row-major into
+`columns` equal columns.
 
 ## Import
 
@@ -9,7 +9,7 @@ into `columns` equal columns. Interactive and linked — live and in static expo
 from manywidgets import Grid
 ```
 
-## Minimal example
+## Example
 
 A 2-column grid of metric cards:
 
@@ -29,10 +29,4 @@ Grid(
 
 {api-table}
 
-Pass children positionally (`Grid(a, b, c)`) or as a list
-(`Grid(children=[a, b, c])`).
-
-## Caveats (static export)
-
-Children render via `host.renderChild` (plugin v0.2.0+); each keeps its own JS,
-CSS, and links, with no kernel.
+Pass children positionally (`Grid(a, b, c)`) or as a list (`Grid(children=[a, b, c])`).

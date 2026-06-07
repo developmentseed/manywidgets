@@ -4,7 +4,7 @@ title: manywidgets
 
 # manywidgets
 
-A set of [anywidget](https://anywidget.dev) widgets for data analysis and geospatial work in notebooks. Each widget is self-contained, links and composes with the others, works well with[lonboard](https://developmentseed.org/lonboard/), and is authored to render correctly both in a **live Jupyter kernel** and in a **static export with no kernel** (via the [`myst-anywidget-static-export`](https://github.com/developmentseedmyst-anywidget-static-export) MyST plugin).
+A set of [anywidget](https://anywidget.dev) widgets for data analysis and geospatial work in notebooks — self-contained, composable, and good with [lonboard](https://developmentseed.org/lonboard/). They work in a live Jupyter kernel and render statically (no kernel) via the [`myst-anywidget-static-export`](https://github.com/developmentseed/myst-anywidget-static-export) MyST plugin.
 
 
 ## Install
@@ -38,8 +38,8 @@ linked, live and in static export.
 [`LayerFilter`](widgets/layer_filter.ipynb) — drive a lonboard map's layers. See
 the [lonboard guide](guides/lonboard.md).
 
-**Linking:** `Binder` — link a widget's trait into another with a transform or
-nested path (see the [linking guide](guides/linking.md)).
+**Linking:** [`Binder`](widgets/binder.ipynb) — link a widget's trait into another
+with a transform or nested path (see the [linking guide](guides/linking.md)).
 
 ## Linking
 

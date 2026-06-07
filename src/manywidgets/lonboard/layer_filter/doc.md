@@ -1,8 +1,7 @@
 # LayerFilter
 
 A checkbox legend that filters a [lonboard](https://developmentseed.org/lonboard/)
-layer by category (writes `filter_categories` from the layer's
-`DataFilterExtension`). Works live and in static export.
+layer by category (writes `filter_categories` via the layer's `DataFilterExtension`).
 
 ```{note}
 `manywidgets.lonboard` is optional — install it with
@@ -17,7 +16,7 @@ shows a **live map** with these controls.
 from manywidgets.lonboard import LayerFilter
 ```
 
-## Usage
+## Example
 
 ```python
 from lonboard import Map, ScatterplotLayer
@@ -40,8 +39,3 @@ Column(legend, m)
 ## API
 
 {api-table}
-
-## Caveats (static export)
-
-The write fans out to every layer proxy and re-applies for late-loading proxies.
-The layer's data must be pre-executed (`nbclient`) so its Arrow buffers embed.

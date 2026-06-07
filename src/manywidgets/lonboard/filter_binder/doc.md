@@ -1,8 +1,7 @@
 # FilterBinder
 
 Drive a [lonboard](https://developmentseed.org/lonboard/) layer's `filter_range`
-from a `RangeSlider` (uses the layer's `DataFilterExtension`). Works live and in
-static export.
+from a `RangeSlider` (uses the layer's `DataFilterExtension`).
 
 ```{note}
 `manywidgets.lonboard` is optional — install it with
@@ -17,7 +16,7 @@ shows a **live map** with these controls.
 from manywidgets.lonboard import FilterBinder
 ```
 
-## Usage
+## Example
 
 ```python
 from lonboard import Map, ScatterplotLayer
@@ -42,10 +41,6 @@ Column(slider, binder, m)
 
 {api-table}
 
-## Caveats (static export)
-
-- **Use seconds, not milliseconds** for time filters: `DataFilterExtension` compares
-  as float32 in the shader and millisecond timestamps overflow its exact-integer
-  range. Set `get_filter_value` in seconds and feed the slider seconds too.
-- The write fans out to every layer proxy and re-applies for late-loading proxies.
-- For single-ended filtering, pass a `Slider` and set `low_field=high_field="value"`.
+For single-ended filtering, pass a `Slider` and set `low_field=high_field="value"`.
+Use seconds (not milliseconds) for time filters (see the
+[lonboard guide](../guides/lonboard.md)).

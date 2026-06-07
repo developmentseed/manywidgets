@@ -35,6 +35,7 @@ project:
         - file: widgets/number_display.ipynb
         - file: widgets/text.ipynb
         - file: widgets/legend.ipynb
+        - file: widgets/binder.ipynb
     - title: Layout
       children:
         - file: widgets/row.ipynb

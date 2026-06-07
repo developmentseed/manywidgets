@@ -8,7 +8,7 @@ A labelled numeric input (spinner).
 from manywidgets import NumberInput
 ```
 
-## Minimal example
+## Example
 
 ```{code-cell} python
 from manywidgets import NumberInput
@@ -32,7 +32,3 @@ chart = Chart()
 w = NumberInput(label="Width", min=200, max=1200, value=800)
 jsdlink((w, "value"), (chart, "width"))
 ```
-
-## Caveats (static export)
-
-Kernel-free; edits propagate to linked targets in the browser.

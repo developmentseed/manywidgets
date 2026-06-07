@@ -8,21 +8,10 @@ A large animated number readout that counts to its `value`.
 from manywidgets import NumberDisplay
 ```
 
-## Minimal example
+## Example
 
-```{code-cell} python
-from manywidgets import NumberDisplay
-
-NumberDisplay(label="Total", value=125000, format="{:,.0f}", duration=800)
-```
-
-## API
-
-{api-table}
-
-## Interactive (linked)
-
-Drive it from a slider — drag to watch it count:
+Read-only — drive it from another widget (see the
+[linking guide](../guides/linking.md)). Drag the slider to watch it count:
 
 ```{code-cell} python
 from ipywidgets import jsdlink
@@ -34,19 +23,6 @@ jsdlink((s, "value"), (nd, "value"))
 display(s, nd)
 ```
 
-## Linking
+## API
 
-```python
-from ipywidgets import jsdlink
-from manywidgets import NumberDisplay, Slider
-
-s = Slider(min=0, max=1000, value=250)
-nd = NumberDisplay(label="Selected", format="{:,.0f}", duration=400)
-jsdlink((s, "value"), (nd, "value"))
-```
-
-See the [linking guide](../guides/linking.md).
-
-## Caveats (static export)
-
-Read-only; animates and updates from linked sources with no kernel.
+{api-table}

@@ -8,7 +8,7 @@ A labelled boolean switch.
 from manywidgets import Toggle
 ```
 
-## Minimal example
+## Example
 
 ```{code-cell} python
 from manywidgets import Toggle
@@ -32,7 +32,3 @@ chart = Chart()
 legend = Toggle(label="Legend", value=True)
 jsdlink((legend, "value"), (chart, "legend_enabled"))
 ```
-
-## Caveats (static export)
-
-Kernel-free; the switch toggles and drives linked targets in the browser.

@@ -6,8 +6,8 @@ authored to also render correctly when statically exported (no kernel) via the
 ``jsdlink`` for the simple cases, or the :class:`~manywidgets.Binder` widget for
 transforms and nested-path targets that jslink can't express.
 
-The optional ``manywidgets.lonboard`` subpackage (first-class lonboard interop
-widgets) is planned for a future release.
+The optional ``manywidgets.lonboard`` subpackage adds control widgets for lonboard
+maps; install it with ``pip install "manywidgets[lonboard]"``.
 """
 
 from ._base import BaseWidget

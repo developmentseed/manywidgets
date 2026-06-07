@@ -8,7 +8,7 @@ A click button with a `clicks` counter and Python `on_click` callbacks.
 from manywidgets import Button
 ```
 
-## Minimal example
+## Example
 
 ```{code-cell} python
 from manywidgets import Button
@@ -44,8 +44,3 @@ btn = Button(label="+1")
 count = NumberDisplay(label="Clicks", duration=0)
 jsdlink((btn, "clicks"), (count, "value"))
 ```
-
-## Caveats (static export)
-
-`clicks` still increments in the browser (so `jslink`/`Binder` targets update),
-but `on_click` Python callbacks require a live kernel.

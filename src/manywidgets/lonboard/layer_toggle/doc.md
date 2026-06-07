@@ -1,7 +1,7 @@
 # LayerToggle
 
 A switch that shows/hides a [lonboard](https://developmentseed.org/lonboard/) layer
-by writing its `visible` trait. Works live and in static export.
+by writing its `visible` trait.
 
 ```{note}
 `manywidgets.lonboard` is optional — install it with
@@ -16,7 +16,7 @@ shows a **live map** with these controls.
 from manywidgets.lonboard import LayerToggle
 ```
 
-## Usage
+## Example
 
 ```python
 from lonboard import Map, ScatterplotLayer
@@ -34,9 +34,3 @@ Column(toggle, m)
 ## API
 
 {api-table}
-
-## Caveats (static export)
-
-The toggle writes to every proxy of the layer and re-applies as late-loading map
-proxies register (no kernel needed). The lonboard layer's data must be pre-executed
-(`nbclient`) so its Arrow buffers embed in the page.

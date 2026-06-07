@@ -1,11 +1,11 @@
 # manywidgets
 
 A composable set of [anywidget](https://anywidget.dev)-based widgets for data
-analysis and geospatial work in notebooks. Widgets are self-contained, link and
-compose with each other, work well with [lonboard](https://developmentseed.org/lonboard/),
-and are authored to **render statically (no kernel)** when a notebook is exported
-with the [`myst-anywidget-static-export`](https://github.com/developmentseed/myst-anywidget-static-export)
-MyST plugin — while remaining ordinary anywidgets in a live kernel.
+analysis and geospatial work in notebooks. They're self-contained, link and
+compose, work well with [lonboard](https://developmentseed.org/lonboard/), and
+render statically (no kernel) via the
+[`myst-anywidget-static-export`](https://github.com/developmentseed/myst-anywidget-static-export)
+MyST plugin.
 
 > **Status:** early but feature-complete for v1 — `Chart`, input controls (`Slider`,
 > `RangeSlider`, `Dropdown`, `Toggle`, `Button`, `NumberInput`), value displays

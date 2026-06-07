@@ -8,46 +8,24 @@ A text readout, optionally rendered as Markdown.
 from manywidgets import Text
 ```
 
-## Minimal example
+## Example
+
+Read-only — drive it from another widget (see the
+[linking guide](../guides/linking.md)). Echo a dropdown selection, rendered as Markdown:
 
 ```{code-cell} python
-from manywidgets import Text
+from ipywidgets import jsdlink
+from manywidgets import Dropdown, Text
 
-Text(value="**Status:** ready", markdown=True)
+pick = Dropdown(options=["**bold**", "_italic_", "`code`"], value="**bold**")
+echo = Text(markdown=True)
+jsdlink((pick, "value"), (echo, "value"))
+display(pick, echo)
 ```
 
 ## API
 
 {api-table}
 
-## Interactive (linked)
-
-Echo a dropdown selection into the text readout:
-
-```{code-cell} python
-from ipywidgets import jsdlink
-from manywidgets import Dropdown, Text
-
-pick = Dropdown(options=["alpha", "beta", "gamma"], value="alpha")
-echo = Text()
-jsdlink((pick, "value"), (echo, "value"))
-display(pick, echo)
-```
-
-## Linking
-
-```python
-from ipywidgets import jsdlink
-from manywidgets import Dropdown, Text
-
-pick = Dropdown(options=["a", "b", "c"], value="a")
-echo = Text()
-jsdlink((pick, "value"), (echo, "value"))
-```
-
-See the [linking guide](../guides/linking.md).
-
-## Caveats (static export)
-
-Renders with no kernel. With `markdown=True`, `value` is parsed to HTML and set as
-`innerHTML` — treat it as any notebook-authored content.
+With `markdown=True`, `value` is parsed to HTML and set as `innerHTML` — treat it
+as any notebook-authored content.

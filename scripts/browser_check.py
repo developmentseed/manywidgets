@@ -219,6 +219,7 @@ def main() -> int:
                 "/number-display/": ".manywidgets-numberdisplay__value",
                 "/text/": ".manywidgets-text",
                 "/legend/": ".manywidgets-legend__swatch",
+                "/binder/": ".manywidgets-binder",
                 # Layout pages: assert the container rendered a real child inside it.
                 "/row/": ".manywidgets-row .manywidgets-stat",
                 "/column/": ".manywidgets-column .manywidgets-numberdisplay__value",
