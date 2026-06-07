@@ -1,5 +1,5 @@
 .manywidgets-column {
-  margin: 10px 0;
+  margin: var(--mw-block-margin, 10px 0);
 }
 
 .manywidgets-column__cell {

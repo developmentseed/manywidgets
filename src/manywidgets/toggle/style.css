@@ -1,11 +1,11 @@
 .manywidgets-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  margin: 10px 0;
+  gap: var(--mw-space-4, 10px);
+  margin: var(--mw-block-margin, 10px 0);
   cursor: pointer;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, sans-serif;
+  font-family: var(--mw-font-family, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif);
   user-select: none;
 }
 
@@ -21,7 +21,7 @@
   width: 40px;
   height: 22px;
   border-radius: 11px;
-  background: #d0d7de;
+  background: var(--mw-color-border-strong, #d0d7de);
   transition: background 0.2s ease;
   flex: none;
 }
@@ -34,13 +34,13 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--mw-color-on-accent, #fff);
   transition: transform 0.2s ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .manywidgets-toggle__input:checked + .manywidgets-toggle__track {
-  background: #0366d6;
+  background: var(--mw-color-accent, #0366d6);
 }
 
 .manywidgets-toggle__input:checked + .manywidgets-toggle__track::after {
@@ -48,7 +48,7 @@
 }
 
 .manywidgets-toggle__label {
-  color: #24292e;
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--mw-color-text, #24292e);
+  font-size: var(--mw-font-size-md, 14px);
+  font-weight: var(--mw-font-weight-strong, 600);
 }

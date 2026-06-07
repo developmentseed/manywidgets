@@ -1,21 +1,21 @@
 .manywidgets-legend {
   display: inline-block;
-  padding: 10px 14px;
-  border: 1px solid #e1e4e8;
-  border-radius: 8px;
-  background: #ffffff;
-  margin: 10px 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, sans-serif;
+  padding: var(--mw-space-4, 10px) var(--mw-space-5, 14px);
+  border: 1px solid var(--mw-color-border, #e1e4e8);
+  border-radius: var(--mw-radius, 8px);
+  background: var(--mw-color-surface, #ffffff);
+  margin: var(--mw-block-margin, 10px 0);
+  font-family: var(--mw-font-family, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif);
 }
 
 .manywidgets-legend__title {
-  color: #586069;
-  font-size: 12px;
-  font-weight: 600;
+  color: var(--mw-color-text-muted, #586069);
+  font-size: var(--mw-font-size-sm, 12px);
+  font-weight: var(--mw-font-weight-strong, 600);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-bottom: 6px;
+  margin-bottom: var(--mw-space-2, 6px);
 }
 
 .manywidgets-legend__list {
@@ -23,13 +23,13 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 4px;
+  gap: var(--mw-space-1, 4px);
 }
 
 .manywidgets-legend__item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--mw-space-3, 8px);
 }
 
 .manywidgets-legend__swatch {
@@ -41,6 +41,6 @@
 }
 
 .manywidgets-legend__label {
-  font-size: 14px;
-  color: #24292e;
+  font-size: var(--mw-font-size-md, 14px);
+  color: var(--mw-color-text, #24292e);
 }

@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { onChanges } from "@manywidgets/core";
+import { applyThemeVars, onChanges } from "@manywidgets/core";
 import { marked } from "marked";
 
 interface TextModel {
@@ -11,6 +11,7 @@ function render({ model, el }: RenderProps<TextModel>): void {
   const container = document.createElement("div");
   container.className = "manywidgets-text";
   el.appendChild(container);
+  applyThemeVars(container, model);
 
   function update(): void {
     const value = model.get("value") ?? "";

@@ -68,6 +68,11 @@ def public_traits(cls):
                 continue
             if not tr.metadata.get("sync"):
                 continue
+            # ``theme_vars`` is styling plumbing (set via theme=/style=), not a
+            # user-facing trait — keep it out of the API table. It has no leading
+            # underscore so it survives static export (see BaseWidget).
+            if name == "theme_vars":
+                continue
             if name in _BASE_TRAITS and name != "widget_id":
                 continue
             seen.add(name)

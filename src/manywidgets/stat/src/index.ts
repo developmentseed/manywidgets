@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { onChanges } from "@manywidgets/core";
+import { applyThemeVars, onChanges } from "@manywidgets/core";
 
 interface StatModel {
   label: string;
@@ -31,6 +31,7 @@ function render({ model, el }: RenderProps<StatModel>): void {
   card.appendChild(valueRow);
   card.appendChild(deltaEl);
   el.appendChild(card);
+  applyThemeVars(card, model);
 
   function update(): void {
     labelEl.textContent = model.get("label");

@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { asNumber, idOf, type ModelHandle, resolveModel } from "@manywidgets/core";
+import { applyThemeVars, asNumber, idOf, type ModelHandle, resolveModel } from "@manywidgets/core";
 
 interface FilterBinderModel {
   source: unknown;
@@ -21,6 +21,7 @@ async function render({ model, el }: RenderProps<FilterBinderModel>): Promise<vo
     "background:#f6f8fa;max-width:fit-content;margin:6px 0;";
   const status = document.createElement("div");
   el.appendChild(status);
+  applyThemeVars(el, model);
 
   const lowField = model.get("low_field") || "low";
   const highField = model.get("high_field") || "high";

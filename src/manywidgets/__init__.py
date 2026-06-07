@@ -24,8 +24,10 @@ from .number_input import NumberInput
 from .range_slider import RangeSlider
 from .row import Row
 from .slider import Slider
+from . import themes
 from .stat import Stat
 from .text import Text
+from .themes import Theme
 from .toggle import Toggle
 
 __all__ = [
@@ -44,6 +46,8 @@ __all__ = [
     "Slider",
     "Stat",
     "Text",
+    "Theme",
     "Toggle",
     "__version__",
+    "themes",
 ]

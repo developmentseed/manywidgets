@@ -34,3 +34,9 @@ r = RangeSlider(min=0, max=100, low=10, high=90)
 hi = NumberDisplay(label="High", duration=0)
 jsdlink((r, "high"), (hi, "value"))
 ```
+
+## Styling
+
+Themed via the [styling guide](../guides/styling.md). Widget-specific token:
+
+- `--mw-control-max-width` (default `320px`) — the control's max width.

@@ -26,3 +26,9 @@ display(btn, clicks)
 ## API
 
 {api-table}
+
+## Styling
+
+Themed via the [styling guide](../guides/styling.md). Widget-specific token:
+
+- `--mw-stat-value-size` (default `30px`) — the metric value's font size.

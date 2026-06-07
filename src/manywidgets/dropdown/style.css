@@ -1,28 +1,28 @@
 .manywidgets-dropdown {
-  padding: 10px 14px;
-  border: 1px solid #e1e4e8;
-  border-radius: 8px;
-  background: #ffffff;
-  max-width: 320px;
-  margin: 10px 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, sans-serif;
+  padding: var(--mw-space-4, 10px) var(--mw-space-5, 14px);
+  border: 1px solid var(--mw-color-border, #e1e4e8);
+  border-radius: var(--mw-radius, 8px);
+  background: var(--mw-color-surface, #ffffff);
+  max-width: var(--mw-control-max-width, 320px);
+  margin: var(--mw-block-margin, 10px 0);
+  font-family: var(--mw-font-family, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif);
   box-sizing: border-box;
   display: grid;
-  gap: 6px;
+  gap: var(--mw-space-2, 6px);
 }
 
 .manywidgets-dropdown__label {
-  color: #24292e;
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--mw-color-text, #24292e);
+  font-size: var(--mw-font-size-md, 14px);
+  font-weight: var(--mw-font-weight-strong, 600);
 }
 
 .manywidgets-dropdown__select {
   width: 100%;
   padding: 6px 8px;
-  font-size: 14px;
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
-  background: #fff;
+  font-size: var(--mw-font-size-md, 14px);
+  border: 1px solid var(--mw-color-border-strong, #d0d7de);
+  border-radius: var(--mw-radius-sm, 6px);
+  background: var(--mw-color-surface, #fff);
 }

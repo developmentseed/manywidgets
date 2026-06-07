@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { idOf, type ModelHandle, resolveModel, safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, idOf, type ModelHandle, resolveModel, safeSaveChanges } from "@manywidgets/core";
 
 type Category = string | number | [unknown, string];
 
@@ -29,6 +29,7 @@ async function render({ model, el }: RenderProps<LayerFilterModel>): Promise<voi
   list.className = "manywidgets-layerfilter__list";
   container.appendChild(list);
   el.appendChild(container);
+  applyThemeVars(container, model);
 
   const categories = model.get("categories") || [];
   const enabled = new Set((model.get("value") || []).map((v) => JSON.stringify(v)));

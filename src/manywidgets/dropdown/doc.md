@@ -34,3 +34,9 @@ chart = Chart()
 kind = Dropdown(options=["line", "bar", "scatter"], value="line")
 jsdlink((kind, "value"), (chart, "chart_type"))
 ```
+
+## Styling
+
+Themed via the [styling guide](../guides/styling.md). Widget-specific token:
+
+- `--mw-control-max-width` (default `320px`) — the control's max width.

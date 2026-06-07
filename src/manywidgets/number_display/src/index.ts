@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { asNumber } from "@manywidgets/core";
+import { applyThemeVars, asNumber } from "@manywidgets/core";
 
 interface NumberDisplayModel {
   value: number;
@@ -56,6 +56,7 @@ function render({ model, el }: RenderProps<NumberDisplayModel>): void {
   container.appendChild(labelEl);
   container.appendChild(valueEl);
   el.appendChild(container);
+  applyThemeVars(container, model);
 
   let displayed = 0;
   const setText = (n: number) => {

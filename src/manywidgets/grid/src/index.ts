@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { renderChild, type RenderArgs } from "@manywidgets/core";
+import { applyThemeVars, renderChild, type RenderArgs } from "@manywidgets/core";
 
 interface GridModel {
   children: string[];
@@ -12,6 +12,7 @@ async function render(args: RenderProps<GridModel>): Promise<() => void> {
   const container = document.createElement("div");
   container.className = "manywidgets-grid";
   el.appendChild(container);
+  applyThemeVars(container, model);
 
   let cleanups: Array<() => void> = [];
 

@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { onChanges, safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, onChanges, safeSaveChanges } from "@manywidgets/core";
 import Chart from "chart.js/auto";
 
 interface Series {
@@ -33,6 +33,7 @@ interface ChartModel {
   animation_enabled: boolean;
   tooltips_enabled: boolean;
   legend_enabled: boolean;
+  palette: string[];
   clicked_point: PointEvent | Record<string, never>;
   hover_point: PointEvent | Record<string, never>;
 }
@@ -42,9 +43,10 @@ const PALETTE = [
   "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf",
 ];
 
-function formatSeriesData(seriesData: Series[], defaultType: string) {
+function formatSeriesData(seriesData: Series[], defaultType: string, palette: string[]) {
+  const colors = palette && palette.length ? palette : PALETTE;
   return (seriesData || []).map((series, index) => {
-    const color = series.color || PALETTE[index % PALETTE.length];
+    const color = series.color || colors[index % colors.length];
     const type = series.type || defaultType || "line";
 
     let data: unknown;
@@ -92,6 +94,7 @@ function render({ model, el }: RenderProps<ChartModel>): () => void {
   const canvas = document.createElement("canvas");
   container.appendChild(canvas);
   el.appendChild(container);
+  applyThemeVars(container, model);
 
   let chart: Chart | null = null;
 
@@ -151,7 +154,13 @@ function render({ model, el }: RenderProps<ChartModel>): () => void {
     chart?.destroy();
     chart = new Chart(canvas, {
       type: (model.get("chart_type") || "line") as never,
-      data: { datasets: formatSeriesData(model.get("series_data"), model.get("chart_type")) as never },
+      data: {
+        datasets: formatSeriesData(
+          model.get("series_data"),
+          model.get("chart_type"),
+          model.get("palette"),
+        ) as never,
+      },
       options: buildOptions() as never,
     });
   }
@@ -160,7 +169,13 @@ function render({ model, el }: RenderProps<ChartModel>): () => void {
     if (!chart) {
       build();
     } else {
-      chart.data = { datasets: formatSeriesData(model.get("series_data"), model.get("chart_type")) as never };
+      chart.data = {
+        datasets: formatSeriesData(
+          model.get("series_data"),
+          model.get("chart_type"),
+          model.get("palette"),
+        ) as never,
+      };
       chart.options = buildOptions() as never;
       chart.update();
     }
@@ -175,6 +190,7 @@ function render({ model, el }: RenderProps<ChartModel>): () => void {
     [
       "series_data",
       "chart_options",
+      "palette",
       "animation_enabled",
       "tooltips_enabled",
       "legend_enabled",

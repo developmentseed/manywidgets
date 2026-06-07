@@ -46,13 +46,43 @@ class BaseWidget(anywidget.AnyWidget):
     cross-widget linking. Subclasses set their own ``_esm`` / ``_css`` (relative
     to their own file, via :func:`asset`) exactly like the golden-example
     structure.
+
+    Every widget accepts ``theme`` and ``style`` keyword arguments for custom
+    styling. Both resolve to a flat ``{"--mw-*": value}`` dict synced to the
+    front-end as ``theme_vars`` and applied as inline CSS custom properties (see
+    ``applyThemeVars`` in ``@manywidgets/core``). ``style`` overrides ``theme``::
+
+        Slider(theme=dark, style={"--mw-color-accent": "#7c3aed"})
     """
 
     widget_id = traitlets.Unicode(
         help="Stable unique id used for cross-widget linking (auto-assigned)."
     ).tag(sync=True)
 
+    # Flat {"--mw-*": value} dict applied as inline CSS custom properties on the
+    # widget's root element. Merged on the Python side from ``theme`` / ``style``;
+    # the front-end just sets each property (one trait, one listener).
+    #
+    # NOTE: this trait deliberately has NO leading underscore. The static-export
+    # plugin builds the *directly displayed* (root) widget's front-end proxy from
+    # public traits only — underscore-prefixed traits (``_model_name``, ``_esm``,
+    # …) are dropped from it. A ``_theme_vars`` name would therefore never reach a
+    # root widget (e.g. a themed layout), so themes would silently not apply.
+    theme_vars = traitlets.Dict(
+        help="Resolved CSS custom properties (set via the theme / style kwargs)."
+    ).tag(sync=True)
+
     def __init__(self, **kwargs):
+        theme = kwargs.pop("theme", None)
+        style = kwargs.pop("style", None)
         super().__init__(**kwargs)
         if not self.widget_id:
             self.widget_id = _next_id(type(self).__name__.lower())
+
+        resolved = dict(self.theme_vars)
+        if theme is not None:
+            resolved.update(theme.to_vars())  # theme: any object exposing to_vars()
+        if style:
+            resolved.update(style)  # per-widget overrides win over the theme
+        if resolved:
+            self.theme_vars = resolved

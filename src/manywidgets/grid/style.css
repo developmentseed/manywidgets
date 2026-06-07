@@ -1,5 +1,5 @@
 .manywidgets-grid {
-  margin: 10px 0;
+  margin: var(--mw-block-margin, 10px 0);
 }
 
 .manywidgets-grid__cell {

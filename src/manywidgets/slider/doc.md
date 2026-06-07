@@ -32,3 +32,9 @@ slider = Slider(label="Height", min=200, max=600, value=320)
 chart = Chart(title="Linked")
 jsdlink((slider, "value"), (chart, "height"))
 ```
+
+## Styling
+
+Themed via the [styling guide](../guides/styling.md). Widget-specific token:
+
+- `--mw-control-max-width` (default `320px`) — the control's max width.

@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { asNumber, onChanges, safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, asNumber, onChanges, safeSaveChanges } from "@manywidgets/core";
 
 interface NumberInputModel {
   value: number;
@@ -24,6 +24,7 @@ function render({ model, el }: RenderProps<NumberInputModel>): void {
   container.appendChild(label);
   container.appendChild(input);
   el.appendChild(container);
+  applyThemeVars(container, model);
 
   function syncBounds(): void {
     const min = model.get("min");
