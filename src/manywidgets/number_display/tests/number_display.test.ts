@@ -10,6 +10,17 @@ describe("formatNumber", () => {
     expect(formatNumber(1234, "{:,}")).toBe("1,234");
     expect(formatNumber(3.14159, "{:.2f}")).toBe("3.14");
   });
+
+  it("supports a literal prefix and/or suffix around the field", () => {
+    expect(formatNumber(4000, "${:,.0f}")).toBe("$4,000");
+    expect(formatNumber(99.5, "{:.1f}%")).toBe("99.5%");
+    expect(formatNumber(42, "{:,.0f} ms")).toBe("42 ms");
+    expect(formatNumber(1234, "~ {} ~")).toBe("~ 1234 ~");
+  });
+
+  it("renders a spec with no field literally", () => {
+    expect(formatNumber(42, "no field")).toBe("no field");
+  });
 });
 
 describe("NumberDisplay", () => {

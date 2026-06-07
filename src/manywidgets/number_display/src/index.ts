@@ -8,13 +8,14 @@ interface NumberDisplayModel {
   label: string;
 }
 
-/** Apply a small Python-style format spec to a number. */
-export function formatNumber(n: number, spec: string): string {
-  if (!spec || spec === "{}") {
-    return Number.isInteger(n) ? String(n) : String(+n.toFixed(2));
-  }
-  const m = spec.match(/^\{:(,)?(?:\.(\d+))?f?\}$/);
-  if (!m) return spec.replace("{}", String(n));
+function defaultFormat(n: number): string {
+  return Number.isInteger(n) ? String(n) : String(+n.toFixed(2));
+}
+
+/** Format the field between braces (e.g. ":,.0f", ":.2f", ":,", or "" for {}). */
+function formatField(n: number, field: string): string {
+  const m = field.match(/^:(,)?(?:\.(\d+))?f?$/);
+  if (!m) return defaultFormat(n);
   const grouping = !!m[1];
   const decimals = m[2] !== undefined ? parseInt(m[2], 10) : undefined;
   if (decimals !== undefined) {
@@ -26,6 +27,17 @@ export function formatNumber(n: number, spec: string): string {
       : n.toFixed(decimals);
   }
   return grouping ? Math.round(n).toLocaleString("en-US") : String(n);
+}
+
+/** Apply a small Python-style format spec to a number. Supports a literal
+ * prefix and/or suffix around a single `{...}` field, e.g. "${:,.0f}" → "$4,000"
+ * or "{:.1f}%" → "99.5%". */
+export function formatNumber(n: number, spec: string): string {
+  if (!spec) return defaultFormat(n);
+  const m = spec.match(/^([^{}]*)\{([^{}]*)\}([^{}]*)$/);
+  if (!m) return spec; // no single {...} field — render the spec literally
+  const [, prefix, field, suffix] = m;
+  return prefix + formatField(n, field) + suffix;
 }
 
 const easeOut = (p: number) => 1 - Math.pow(1 - p, 3);
