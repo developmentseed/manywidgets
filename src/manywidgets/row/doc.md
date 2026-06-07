@@ -27,3 +27,6 @@ Row(s, stat, gap="24px")
 {api-table}
 
 Pass children positionally (`Row(a, b)`) or as a list (`Row(children=[a, b])`).
+
+See [Layout](../examples/layout.ipynb) for how `Row`, `Column`, and `Grid`
+compose into a full screen.

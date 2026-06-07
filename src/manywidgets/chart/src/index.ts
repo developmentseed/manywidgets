@@ -42,9 +42,10 @@ const PALETTE = [
   "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf",
 ];
 
-function formatSeriesData(seriesData: Series[]) {
+function formatSeriesData(seriesData: Series[], defaultType: string) {
   return (seriesData || []).map((series, index) => {
     const color = series.color || PALETTE[index % PALETTE.length];
+    const type = series.type || defaultType || "line";
 
     let data: unknown;
     if (series.data && series.data.length > 0) {
@@ -62,7 +63,7 @@ function formatSeriesData(seriesData: Series[]) {
       data,
       borderColor: color,
       backgroundColor: color + "33",
-      type: series.type || "line",
+      type,
       fill: series.fill !== undefined ? series.fill : false,
       tension: series.tension ?? 0.1,
       pointRadius: series.pointRadius !== undefined ? series.pointRadius : 3,
@@ -70,11 +71,11 @@ function formatSeriesData(seriesData: Series[]) {
       borderWidth: series.borderWidth || 2,
     };
 
-    if (series.type === "scatter") {
+    if (type === "scatter") {
       dataset.showLine = false;
       dataset.pointRadius = series.pointRadius || 5;
     }
-    if (series.type === "bar") {
+    if (type === "bar") {
       dataset.backgroundColor = color + "80";
     }
     return dataset;
@@ -146,23 +147,26 @@ function render({ model, el }: RenderProps<ChartModel>): () => void {
     return options;
   }
 
+  function build(): void {
+    chart?.destroy();
+    chart = new Chart(canvas, {
+      type: (model.get("chart_type") || "line") as never,
+      data: { datasets: formatSeriesData(model.get("series_data"), model.get("chart_type")) as never },
+      options: buildOptions() as never,
+    });
+  }
+
   function createOrUpdate(): void {
-    const datasets = formatSeriesData(model.get("series_data"));
-    const options = buildOptions();
     if (!chart) {
-      chart = new Chart(canvas, {
-        type: (model.get("chart_type") || "line") as never,
-        data: { datasets: datasets as never },
-        options: options as never,
-      });
+      build();
     } else {
-      chart.data = { datasets: datasets as never };
-      chart.options = options as never;
+      chart.data = { datasets: formatSeriesData(model.get("series_data"), model.get("chart_type")) as never };
+      chart.options = buildOptions() as never;
       chart.update();
     }
   }
 
-  if ((model.get("series_data") || []).length > 0) createOrUpdate();
+  if ((model.get("series_data") || []).length > 0) build();
 
   // NOTE: register one listener per trait — the static-export model emitter does
   // not support space-separated event names (see core's onChanges docstring).
@@ -170,7 +174,6 @@ function render({ model, el }: RenderProps<ChartModel>): () => void {
     model,
     [
       "series_data",
-      "chart_type",
       "chart_options",
       "animation_enabled",
       "tooltips_enabled",
@@ -181,6 +184,10 @@ function render({ model, el }: RenderProps<ChartModel>): () => void {
     ],
     createOrUpdate,
   );
+
+  // Switching the default series type requires a fresh chart — Chart.js won't
+  // re-type existing datasets via update().
+  onChanges(model, ["chart_type"], build);
 
   onChanges(model, ["width", "height"], () => {
     container.style.width = `${model.get("width")}px`;

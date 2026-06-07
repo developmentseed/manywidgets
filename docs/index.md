@@ -30,7 +30,8 @@ pip install "manywidgets[lonboard]"
 
 **Layout:** [`Row`](widgets/row.ipynb), [`Column`](widgets/column.ipynb),
 [`Grid`](widgets/grid.ipynb) — arrange widgets side-by-side while keeping them
-linked, live and in static export.
+linked, live and in static export. See the [layout examples](examples/layout.ipynb)
+for how they compose.
 
 **Lonboard interop** (optional, `pip install "manywidgets[lonboard]"`):
 [`LayerToggle`](widgets/layer_toggle.ipynb),

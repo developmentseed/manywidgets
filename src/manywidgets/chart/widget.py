@@ -87,7 +87,10 @@ class Chart(BaseWidget):
         """
         data = self._coerce_points(x, y, data)
         series = {
-            "type": series_type or self.chart_type,
+            # Only pin a type when the caller asks for one; otherwise leave it
+            # unset so the series follows the chart's live ``chart_type`` (lets a
+            # control bound to ``chart_type`` re-type the chart).
+            "type": series_type,
             "data": data,
             "name": name or f"Series {len(self.series_data) + 1}",
         }

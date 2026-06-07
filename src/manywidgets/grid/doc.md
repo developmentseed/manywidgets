@@ -30,3 +30,6 @@ Grid(
 {api-table}
 
 Pass children positionally (`Grid(a, b, c)`) or as a list (`Grid(children=[a, b, c])`).
+
+See [Layout](../examples/layout.ipynb) for how `Row`, `Column`, and `Grid`
+compose into a full screen.

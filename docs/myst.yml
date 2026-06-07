@@ -55,6 +55,7 @@ project:
     - title: Examples
       children:
         - file: examples/demo.ipynb
+        - file: examples/layout.ipynb
         - file: examples/lonboard-map.ipynb
 site:
   template: book-theme
