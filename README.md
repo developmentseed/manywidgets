@@ -38,7 +38,7 @@ chart
 from manywidgets import (
     Chart,                                   # Chart.js charts
     Slider, RangeSlider, Dropdown, Toggle, Button, NumberInput,  # input controls
-    Stat, NumberDisplay, Text,               # value displays
+    Stat, NumberDisplay, Text, Legend,       # value displays
     Row, Column, Grid,                       # layout (arrange + keep children linked)
     Binder,                                  # linking with transforms / nested paths
 )

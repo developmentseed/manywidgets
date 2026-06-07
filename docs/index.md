@@ -36,7 +36,8 @@ pip install "manywidgets[lonboard]"
 [`NumberInput`](widgets/number_input.ipynb).
 
 **Value displays:** [`Stat`](widgets/stat.ipynb),
-[`NumberDisplay`](widgets/number_display.ipynb), [`Text`](widgets/text.ipynb).
+[`NumberDisplay`](widgets/number_display.ipynb), [`Text`](widgets/text.ipynb),
+[`Legend`](widgets/legend.ipynb).
 
 **Layout:** [`Row`](widgets/row.ipynb), [`Column`](widgets/column.ipynb),
 [`Grid`](widgets/grid.ipynb) — arrange widgets side-by-side while keeping them

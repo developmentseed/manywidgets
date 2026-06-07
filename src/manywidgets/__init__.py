@@ -18,6 +18,7 @@ from .chart import Chart
 from .column import Column
 from .dropdown import Dropdown
 from .grid import Grid
+from .legend import Legend
 from .number_display import NumberDisplay
 from .number_input import NumberInput
 from .range_slider import RangeSlider
@@ -35,6 +36,7 @@ __all__ = [
     "Column",
     "Dropdown",
     "Grid",
+    "Legend",
     "NumberDisplay",
     "NumberInput",
     "RangeSlider",

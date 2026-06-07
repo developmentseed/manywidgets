@@ -34,6 +34,46 @@ from manywidgets.lonboard import LayerToggle, FilterBinder
 Column(LayerToggle(layer), FilterBinder(slider, layer), m)
 ```
 
+## Recipe: a layer switcher
+
+A `Map` can hold several layers; one `LayerToggle` per layer (in a `Column`) is a
+layer switcher. Works for any layer type — vector or raster (`BitmapTileLayer`):
+
+```python
+from lonboard import Map, BitmapTileLayer
+from manywidgets import Column
+from manywidgets.lonboard import LayerToggle
+
+osm = BitmapTileLayer(data="https://tile.openstreetmap.org/{z}/{x}/{y}.png", visible=True)
+topo = BitmapTileLayer(data="https://a.tile.opentopomap.org/{z}/{x}/{y}.png", visible=False)
+m = Map([osm, topo], basemap=None)
+
+Column(
+    Column(LayerToggle(osm, label="OpenStreetMap"), LayerToggle(topo, label="OpenTopoMap")),
+    m,
+)
+```
+
+See it live in the [interop example](../examples/lonboard-map.ipynb).
+
+## Recipe: data-driven styling + legend
+
+Colour a layer by a data attribute with a per-row `get_fill_color` array, and pair
+it with a [`Legend`](../widgets/legend.ipynb) built from the **same** palette:
+
+```python
+import numpy as np
+from manywidgets import Legend
+
+palette = np.array([[230, 30, 30], [30, 160, 30], [30, 90, 230]], dtype="uint8")
+layer = ScatterplotLayer.from_geopandas(gdf, get_fill_color=palette[categories])  # one colour per row
+legend = Legend([[palette[i].tolist(), name] for i, name in enumerate(["A", "B", "C"])], title="Category")
+```
+
+(For binned continuous data, bin the values and label the ranges, e.g.
+`["0–10", "10–20", …]`.) See the
+[interop example](../examples/lonboard-map.ipynb).
+
 ## Caveats
 
 - **No `MapFlyer` / live view control.** lonboard's `Map.view_state` is *uncontrolled*

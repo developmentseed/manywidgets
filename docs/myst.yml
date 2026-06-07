@@ -34,6 +34,7 @@ project:
         - file: widgets/stat.ipynb
         - file: widgets/number_display.ipynb
         - file: widgets/text.ipynb
+        - file: widgets/legend.ipynb
     - title: Layout
       children:
         - file: widgets/row.ipynb

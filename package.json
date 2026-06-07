@@ -11,7 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "docs:gen": "python scripts/build_widget_docs.py",
-    "serve": "python -m http.server -d docs/_build/html 8000",
+    "serve": "python -m http.server -d docs/_build/html 3030",
     "clean": "rm -rf src/manywidgets/*/dist"
   },
   "devDependencies": {
