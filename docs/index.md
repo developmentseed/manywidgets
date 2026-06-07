@@ -4,19 +4,8 @@ title: manywidgets
 
 # manywidgets
 
-A thoughtfully constructed, composable set of [anywidget](https://anywidget.dev)
-widgets for data analysis and geospatial work in notebooks. Each widget is
-self-contained, links and composes with the others, works well with
-[lonboard](https://developmentseed.org/lonboard/), and is authored to render
-correctly both in a **live Jupyter kernel** and in a **static export with no
-kernel** (via the [`myst-anywidget-static-export`](https://github.com/developmentseed/myst-anywidget-static-export)
-MyST plugin).
+A set of [anywidget](https://anywidget.dev) widgets for data analysis and geospatial work in notebooks. Each widget is self-contained, links and composes with the others, works well with[lonboard](https://developmentseed.org/lonboard/), and is authored to render correctly both in a **live Jupyter kernel** and in a **static export with no kernel** (via the [`myst-anywidget-static-export`](https://github.com/developmentseedmyst-anywidget-static-export) MyST plugin).
 
-```{note}
-v1 ships a `Chart`, a set of input controls and value displays, and the `Binder`
-linking primitive. First-class lonboard interop widgets are planned for a future
-release.
-```
 
 ## Install
 
