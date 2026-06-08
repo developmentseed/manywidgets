@@ -9,6 +9,12 @@ A set of [anywidget](https://anywidget.dev) widgets for data analysis and geospa
 
 ## Install
 
+**Note**: This is not yet published to PyPi so pip install does not currently work. To install currently, use:
+
+```bash
+pip install "manywidgets[lonboard] @ git+https://github.com/developmentseed/manywidgets.git"
+```
+
 ```bash
 pip install manywidgets
 # optional lonboard interop widgets:
