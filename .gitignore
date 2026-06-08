@@ -26,5 +26,9 @@ docs/plugin.mjs
 # (scripts/build_widget_docs.py) — build artifacts, not source.
 docs/widgets/*.ipynb
 
+# Agent tooling: the skill ships in the package (src/manywidgets/skill/) and is
+# installed locally with `manywidgets install-skill` — don't commit the copy.
+.claude/
+
 # OS
 .DS_Store

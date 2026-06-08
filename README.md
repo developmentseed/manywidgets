@@ -64,6 +64,22 @@ Binder(source=slider, source_field="value",
        multiplier=100, offset=200)
 ```
 
+## Agent skill
+
+manywidgets ships an [agent skill](src/manywidgets/skill/SKILL.md) so coding
+agents can help you build widgets and dashboards. Install it into a location your
+agent discovers:
+
+```bash
+manywidgets install-skill            # ./.claude/skills/manywidgets/ (this project)
+manywidgets install-skill --user     # ~/.claude/skills/manywidgets/ (all projects)
+manywidgets install-skill --path DIR # anywhere else (other agents)
+```
+
+The skill (an entrypoint plus `references/` on widget API, usage, and authoring)
+travels inside the wheel, so it always matches the installed version. The
+per-widget API reference is generated from widget traits — never hand-edited.
+
 ## How it works / design
 
 Every widget extends a thin `BaseWidget` (auto-assigns a stable `widget_id`) and
@@ -94,7 +110,10 @@ Each widget owns its docs in `src/manywidgets/<name>/doc.md` (prose + a
 `{code-cell}` example + an `{api-table}` placeholder). `npm run docs:gen` builds
 `docs/widgets/<name>.ipynb` from those — auto-generating the API table from trait
 introspection — so the per-widget pages are **generated build artifacts**
-(gitignored), not hand-maintained. Build and view:
+(gitignored), not hand-maintained. The agent skill's API reference is generated
+the same way (`npm run skill:gen` → `src/manywidgets/skill/references/widgets-api.md`,
+which **is** committed and CI-checked for drift) — regenerate it after changing
+any widget's traits. Build and view:
 
 ```bash
 # lonboard + geopandas + pyarrow are only needed for the lonboard interop example
