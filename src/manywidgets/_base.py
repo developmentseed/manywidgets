@@ -28,6 +28,21 @@ def _next_id(prefix: str) -> str:
         return f"{prefix}_{_id_counters[prefix]}"
 
 
+def _flatten(children) -> list:
+    """Flatten one level of list/tuple args into a flat list of children.
+
+    Lets layout widgets accept a mix of widgets and lists of widgets, e.g.
+    ``Column(slider, binders, m)`` where ``binders`` is itself a list.
+    """
+    flat: list = []
+    for child in children:
+        if isinstance(child, (list, tuple)):
+            flat.extend(child)
+        else:
+            flat.append(child)
+    return flat
+
+
 def asset(module_file: str, *parts: str) -> pathlib.Path:
     """Resolve a path next to a widget's ``widget.py``.
 

@@ -8,6 +8,12 @@ def test_children_positional_and_defaults():
     assert g.columns == 2 and g.gap == "8px"
 
 
+def test_flattens_list_args():
+    cards = [Stat(), Stat()]
+    g = Grid(Stat(), cards)  # second arg is itself a list
+    assert len(g.children) == 3
+
+
 def test_columns_kwarg():
     g = Grid(Stat(), Stat(), columns=3)
     assert g.columns == 3

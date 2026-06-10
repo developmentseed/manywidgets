@@ -12,7 +12,7 @@ from __future__ import annotations
 import traitlets
 from ipywidgets import Widget, widget_serialization
 
-from .._base import BaseWidget, asset
+from .._base import BaseWidget, _flatten, asset
 
 
 class Row(BaseWidget):
@@ -34,5 +34,5 @@ class Row(BaseWidget):
 
     def __init__(self, *children, **kwargs):
         if children:
-            kwargs.setdefault("children", list(children))
+            kwargs.setdefault("children", _flatten(children))
         super().__init__(**kwargs)

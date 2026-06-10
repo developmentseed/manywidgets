@@ -7,6 +7,12 @@ def test_children_positional():
     assert c.children == [a, b]
 
 
+def test_flattens_list_args():
+    a, b, c = Slider(), NumberDisplay(), Slider()
+    col = Column(a, [b, c])  # second arg is itself a list
+    assert col.children == [a, b, c]
+
+
 def test_defaults_and_marker():
     c = Column()
     assert c.gap == "8px" and c.align == "stretch"

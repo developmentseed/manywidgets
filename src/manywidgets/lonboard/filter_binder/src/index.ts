@@ -28,12 +28,16 @@ async function render({ model, el }: RenderProps<FilterBinderModel>): Promise<vo
   const label = model.get("label") || `${lowField}/${highField} → ${filterField}`;
   status.textContent = `🔗 filter: connecting…  (${label})`;
 
+  // `layer` may be a single widget-ref or a list of them; resolve all of them.
+  const rawLayer = model.get("layer");
+  const layerRefs: unknown[] = Array.isArray(rawLayer) ? rawLayer : [rawLayer];
+
   let source: ModelHandle;
-  let layer: ModelHandle;
+  let layers: ModelHandle[];
   try {
-    [source, layer] = await Promise.all([
+    [source, layers] = await Promise.all([
       resolveModel(model, idOf(model.get("source"))),
-      resolveModel(model, idOf(model.get("layer"))),
+      Promise.all(layerRefs.map((ref) => resolveModel(model, idOf(ref)))),
     ]);
   } catch (err) {
     status.textContent = `❌ filter: ${(err as Error).message}`;
@@ -44,11 +48,13 @@ async function render({ model, el }: RenderProps<FilterBinderModel>): Promise<vo
   const apply = (): void => {
     const low = asNumber(source.get(lowField));
     const high = asNumber(source.get(highField));
-    const key = `${low}:${high}:${layer.models.length}`;
+    const key = `${low}:${high}:${layers.map((l) => l.models.length).join(",")}`;
     if (key === lastKey) return;
     lastKey = key;
-    layer.setByPath(filterField, [low, high]);
-    layer.save();
+    for (const layer of layers) {
+      layer.setByPath(filterField, [low, high]);
+      layer.save();
+    }
     status.textContent = `✅ ${label}: [${low}, ${high}]`;
   };
 

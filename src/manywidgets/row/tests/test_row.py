@@ -7,6 +7,12 @@ def test_children_positional():
     assert r.children == [a, b]
 
 
+def test_flattens_list_args():
+    a, b, c = Slider(), Stat(), Slider()
+    r = Row(a, [b, c])  # second arg is itself a list
+    assert r.children == [a, b, c]
+
+
 def test_children_kwarg_and_defaults():
     a = Slider()
     r = Row(children=[a])
