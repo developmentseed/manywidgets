@@ -1,11 +1,13 @@
 // Shared JS test utilities for widget unit tests (vitest + jsdom).
 //
-// The default `fakeModel` deliberately mimics the STATIC-EXPORT emitter: its
-// `on`/`off` match event names EXACTLY and do NOT split space-separated names.
-// So if a widget regresses to `model.on("change:a change:b", fn)`, its listener
-// never fires here and the widget's own test fails — the unit tests double as a
-// guard for the static-export "one listener per trait" rule. Use `liveModel`
-// for the rare test that needs Backbone-style space-separated `on`.
+// The default `fakeModel` is intentionally STRICTER than the static-export
+// emitter: its `on`/`off` match event names EXACTLY and do NOT split
+// space-separated names. (The real static-export emitter and Backbone both DO
+// split — so `on("change:a change:b", fn)` works in production.) Keeping the
+// fake non-splitting is a deliberate style guard: a regression to
+// `model.on("change:a change:b", fn)` never fires here, so the widget's own test
+// fails and we keep authoring one listener per trait. Use `liveModel` for the
+// rare test that needs Backbone-style space-separated `on`.
 
 export interface FakeModel {
   model_id?: string;
@@ -17,6 +19,10 @@ export interface FakeModel {
   set(key: string, value: unknown): void;
   on(event: string, fn: (...a: unknown[]) => void): void;
   off(event: string, fn: (...a: unknown[]) => void): void;
+  /** Live (Backbone) model only: fire an event with args. */
+  trigger?(event: string, ...args: unknown[]): void;
+  /** Static-export proxy only: deliver an inbound custom message. */
+  receiveCustomMessage?(content: unknown, buffers?: unknown[]): void;
   save_changes(): void;
   /** number of save_changes() calls (test introspection) */
   readonly saved: number;
@@ -43,6 +49,22 @@ export function fakeModel(
   let savedCount = 0;
   const split = (event: string) =>
     opts.splitEvents ? event.split(/\s+/).filter(Boolean) : [event];
+  const dispatch = (event: string, ...args: unknown[]) => {
+    for (const e of split(event)) {
+      const set = listeners.get(e);
+      if (set) for (const fn of [...set]) fn(...args);
+    }
+  };
+
+  // Mirror reality: the live (Backbone) model fires events via `trigger`, while
+  // the static-export proxy exposes `receiveCustomMessage` (the comm mock). Only
+  // one is present so each delivery path in `deliverCustomMessage` is exercised.
+  const comm = opts.splitEvents
+    ? { trigger: dispatch }
+    : {
+        receiveCustomMessage: (content: unknown, buffers?: unknown[]) =>
+          dispatch("msg:custom", content, buffers),
+      };
 
   return {
     model_id: opts.model_id,
@@ -50,8 +72,7 @@ export function fakeModel(
     get: (key) => data[key],
     set(key, value) {
       data[key] = value;
-      const set = listeners.get(`change:${key}`);
-      if (set) for (const fn of [...set]) fn();
+      dispatch(`change:${key}`);
     },
     on(event, fn) {
       for (const e of split(event)) {
@@ -62,6 +83,7 @@ export function fakeModel(
     off(event, fn) {
       for (const e of split(event)) listeners.get(e)?.delete(fn);
     },
+    ...comm,
     save_changes() {
       savedCount += 1;
     },

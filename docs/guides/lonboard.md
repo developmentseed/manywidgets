@@ -23,6 +23,8 @@ and fanning each write out to every proxy of the layer (the `Map` keeps its own)
   from a `RangeSlider` (`DataFilterExtension`).
 - [`LayerFilter`](../widgets/layer_filter.ipynb) — filter a layer by category
   (`filter_categories`) via a checkbox legend.
+- [`MapFlyer`](../widgets/map_flyer.ipynb) — buttons that animate the `Map` to
+  preset locations (`fly_to`).
 
 Compose them with the [layout widgets](../widgets/row.ipynb) to put a control panel
 beside the map:
@@ -74,11 +76,34 @@ legend = Legend([[palette[i].tolist(), name] for i, name in enumerate(["A", "B",
 `["0–10", "10–20", …]`.) See the
 [interop example](../examples/lonboard-map.ipynb).
 
+## Recipe: fly to preset locations
+
+`MapFlyer` repositions an already-rendered `Map` — something `Map.view_state` can't do
+(it's *uncontrolled*: deck.gl reads it once as `initialViewState`). Each preset is a
+dict with a `label` and camera keys; clicking a button animates the map there:
+
+```python
+from lonboard import Map
+from manywidgets import Column
+from manywidgets.lonboard import MapFlyer
+
+m = Map(layer)
+flyer = MapFlyer(m, locations=[
+    {"label": "New York", "longitude": -74.0, "latitude": 40.7, "zoom": 10},
+    {"label": "London", "longitude": -0.12, "latitude": 51.5, "zoom": 9},
+], duration=3000)
+
+Column(flyer, m)
+```
+
+It drives lonboard's existing `fly_to` (a deck.gl `FlyToInterpolator` animation) from the
+browser — no kernel needed — so it works the same live and in static export.
+
 ## Caveats
 
-- **No `MapFlyer` / live view control.** lonboard's `Map.view_state` is *uncontrolled*
-  (deck.gl `initialViewState`): writing it does **not** re-position an already-rendered
-  map. Set the initial `view_state` on the `Map` itself; there's no widget to fly it.
+- **`MapFlyer` is fire-and-forget.** A fly-to is a one-shot animation command, not stored
+  state, so it positions the map on **click**, not on load, and won't replay if the map
+  re-renders. Set the starting position via the `Map`'s own `view_state`.
 - **Seconds, not milliseconds** for time filters — `DataFilterExtension` compares as
   float32 in the shader, so millisecond timestamps overflow its exact-integer range.
   Use seconds for `get_filter_value` and the slider bounds.

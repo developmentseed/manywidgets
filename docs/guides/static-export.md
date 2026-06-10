@@ -24,7 +24,7 @@ rules the plugin needs.
    ```yaml
    project:
      plugins:
-       - https://github.com/developmentseed/myst-anywidget-static-export/releases/download/v0.2.0/plugin.mjs
+       - https://github.com/developmentseed/myst-anywidget-static-export/releases/download/v0.3.0/plugin.mjs
    ```
 
 3. Build the site: `myst build --html`. The plugin rewrites each widget output
