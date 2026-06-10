@@ -37,6 +37,12 @@ binder = FilterBinder(slider, layer)   # slider.low/high -> layer.filter_range
 Column(slider, binder, m)
 ```
 
+```{note}
+For **static export**, include the binder somewhere in your displayed layout (e.g.
+`Column(slider, binder, m)`) so its JavaScript activates — an exported page has no
+kernel. In a **live kernel** the binding also works without displaying the binder.
+```
+
 ## API
 
 {api-table}
