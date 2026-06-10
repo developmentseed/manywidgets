@@ -306,7 +306,7 @@ LayerFilter(layer, categories, value, label='Filter')
 
 ### `FilterBinder`
 
-Bind a (Range)Slider to a lonboard layer's ``filter_range``.
+Bind a (Range)Slider to one or more lonboard layers' ``filter_range``.
 
 ```python
 FilterBinder(source, layer, low_field='low', high_field='high', filter_field='filter_range', label='')
@@ -315,7 +315,7 @@ FilterBinder(source, layer, low_field='low', high_field='high', filter_field='fi
 | Trait | Type | Default | Description |
 |---|---|---|---|
 | `source` | Instance | — | The slider providing low/high values. |
-| `layer` | Instance | — | The lonboard layer to filter. |
+| `layer` | Union | — | A single lonboard layer, or a list of layers, to filter. |
 | `low_field` | Unicode | `'low'` | Source trait for the low bound. |
 | `high_field` | Unicode | `'high'` | Source trait for the high bound. |
 | `filter_field` | Unicode | `'filter_range'` | Layer trait to write [low, high] to. |

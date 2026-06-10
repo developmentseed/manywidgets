@@ -45,4 +45,28 @@ describe("FilterBinder", () => {
     expect(p2.get("filter_range")).toEqual([1, 2]);
     cleanup();
   });
+
+  it("writes to every layer when given a list of layers", async () => {
+    const slider = fakeModel({ widget_id: "rs3", low: 5, high: 25 });
+    const layerA = fakeModel({ filter_range: null }, { model_id: "layerA" });
+    const layerB = fakeModel({ filter_range: null }, { model_id: "layerB" });
+    const cleanup = installHostRegistry([slider, layerA, layerB]);
+    const model = fakeModel({
+      source: "IPY_MODEL_rs3",
+      layer: ["IPY_MODEL_layerA", "IPY_MODEL_layerB"],
+      low_field: "low",
+      high_field: "high",
+      filter_field: "filter_range",
+      label: "",
+    });
+
+    await widget.render({ model, el: mountEl() } as never);
+    expect(layerA.get("filter_range")).toEqual([5, 25]);
+    expect(layerB.get("filter_range")).toEqual([5, 25]);
+
+    slider.set("high", 15);
+    expect(layerA.get("filter_range")).toEqual([5, 15]);
+    expect(layerB.get("filter_range")).toEqual([5, 15]);
+    cleanup();
+  });
 });

@@ -15,15 +15,24 @@ from ..._base import BaseWidget, asset
 
 
 class FilterBinder(BaseWidget):
-    """Bind a (Range)Slider to a lonboard layer's ``filter_range``."""
+    """Bind a (Range)Slider to one or more lonboard layers' ``filter_range``.
+
+    ``layer`` may be a single layer or a list of layers; one slider then drives
+    them all.
+    """
 
     _esm = asset(__file__, "dist", "widget.js")
 
     source = traitlets.Instance(
         Widget, allow_none=True, help="The slider providing low/high values."
     ).tag(sync=True, **widget_serialization)
-    layer = traitlets.Instance(
-        Widget, allow_none=True, help="The lonboard layer to filter."
+    layer = traitlets.Union(
+        [
+            traitlets.Instance(Widget),
+            traitlets.List(traitlets.Instance(Widget)),
+        ],
+        allow_none=True,
+        help="A single lonboard layer, or a list of layers, to filter.",
     ).tag(sync=True, **widget_serialization)
     low_field = traitlets.Unicode("low", help="Source trait for the low bound.").tag(sync=True)
     high_field = traitlets.Unicode("high", help="Source trait for the high bound.").tag(sync=True)

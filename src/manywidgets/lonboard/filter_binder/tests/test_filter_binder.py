@@ -15,6 +15,13 @@ def test_source_layer_and_defaults():
     assert fb.filter_field == "filter_range"
 
 
+def test_accepts_list_of_layers():
+    src = RangeSlider()
+    layers = [Slider(), Slider()]  # stand-in Widgets for layers
+    fb = FilterBinder(src, layers)
+    assert fb.layer == layers
+
+
 def test_traits_synced():
     for name in ("source", "layer", "low_field", "high_field", "filter_field"):
         assert FilterBinder.class_traits()[name].metadata.get("sync") is True
