@@ -34,6 +34,9 @@ dev = [
     "ipykernel",
 ]
 
+[project.scripts]
+manywidgets = "manywidgets.__main__:main"
+
 [project.urls]
 Homepage = "https://github.com/developmentseed/manywidgets"
 Repository = "https://github.com/developmentseed/manywidgets"

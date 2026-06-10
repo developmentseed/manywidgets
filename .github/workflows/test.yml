@@ -40,3 +40,9 @@ jobs:
       - run: npm ci && npm run build
       - run: pip install -e ".[dev,lonboard]"
       - run: pytest -q
+      # The agent-skill API reference is generated from widget traits and
+      # committed; fail if it's stale (regenerate with `npm run skill:gen`).
+      - name: Skill reference is up to date
+        run: |
+          npm run skill:gen
+          git diff --exit-code src/manywidgets/skill/references/widgets-api.md
