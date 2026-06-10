@@ -1,13 +1,20 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   asNumber,
+  deliverCustomMessage,
   onChanges,
   renderChild,
   resolveModel,
   safeSaveChanges,
   setByPath,
 } from "@manywidgets/core";
-import { fakeHost, fakeModel, installHostRegistry, mountEl } from "@manywidgets/test-utils";
+import {
+  fakeHost,
+  fakeModel,
+  installHostRegistry,
+  liveModel,
+  mountEl,
+} from "@manywidgets/test-utils";
 
 describe("asNumber", () => {
   it("coerces and falls back", () => {
@@ -97,6 +104,58 @@ describe("resolveModel (live kernel)", () => {
     });
     const handle = await resolveModel(caller as never, "anything");
     expect(handle.get("value")).toBe(11);
+  });
+});
+
+describe("deliverCustomMessage", () => {
+  it("static export: fires msg:custom listeners via receiveCustomMessage", () => {
+    const m = fakeModel({}); // static proxy: has receiveCustomMessage, no trigger
+    let got: unknown;
+    m.on("msg:custom", (msg) => {
+      got = msg;
+    });
+    deliverCustomMessage(m as never, { type: "fly-to", zoom: 4 });
+    expect(got).toEqual({ type: "fly-to", zoom: 4 });
+  });
+
+  it("live kernel: fires msg:custom listeners via Backbone trigger", () => {
+    const m = liveModel({}); // live model: has trigger, no receiveCustomMessage
+    let got: unknown;
+    let buffers: unknown;
+    m.on("msg:custom", (msg, b) => {
+      got = msg;
+      buffers = b;
+    });
+    deliverCustomMessage(m as never, { type: "fly-to" }, ["buf"]);
+    expect(got).toEqual({ type: "fly-to" });
+    expect(buffers).toEqual(["buf"]);
+  });
+
+  it("no-ops when neither delivery path exists", () => {
+    const bare = { get: () => undefined, set: () => {} };
+    expect(() => deliverCustomMessage(bare as never, { type: "x" })).not.toThrow();
+  });
+});
+
+describe("ModelHandle.sendCustom", () => {
+  let cleanup: () => void;
+  afterEach(() => cleanup?.());
+
+  it("fans a custom message out to every matching proxy", async () => {
+    const p1 = fakeModel({}, { model_id: "map-1" });
+    const p2 = fakeModel({}, { model_id: "map-1" });
+    cleanup = installHostRegistry([p1, p2]);
+    const seen: unknown[] = [];
+    p1.on("msg:custom", (m) => seen.push(m));
+    p2.on("msg:custom", (m) => seen.push(m));
+
+    const handle = await resolveModel(fakeModel({}) as never, "map-1");
+    handle.sendCustom({ type: "fly-to", longitude: 1 });
+
+    expect(seen).toEqual([
+      { type: "fly-to", longitude: 1 },
+      { type: "fly-to", longitude: 1 },
+    ]);
   });
 });
 

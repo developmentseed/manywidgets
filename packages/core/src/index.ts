@@ -25,6 +25,12 @@ export interface AnyModel {
   save_changes?: () => void;
   on?: (event: string, cb: (...args: unknown[]) => void) => void;
   off?: (event: string, cb: (...args: unknown[]) => void) => void;
+  /** Live (Backbone) model: fire an event locally. Used to deliver a custom
+   *  message (`trigger("msg:custom", content, buffers)`) without a kernel. */
+  trigger?: (event: string, ...args: unknown[]) => void;
+  /** Static-export proxy: simulate an inbound kernel→frontend custom message by
+   *  firing the model's `msg:custom` listeners locally. */
+  receiveCustomMessage?: (content: unknown, buffers?: unknown[]) => void;
   widget_manager?: {
     get_model?: (id: string) => Promise<AnyModel>;
     create_view?: (model: AnyModel) => Promise<{ el: HTMLElement; remove?: () => void }>;
@@ -66,10 +72,10 @@ export function onChange(
 /**
  * Subscribe one callback to several trait changes.
  *
- * IMPORTANT: always register one listener per event. The live (Backbone) model
- * accepts space-separated event names in `on(...)`, but the static-export model
- * emitter does NOT — `on("change:a change:b", fn)` silently never fires there.
- * Use this helper instead of space-separated names.
+ * Registers one listener per event. Both the live (Backbone) model and the
+ * static-export emitter now accept space-separated event names in `on(...)`, so
+ * `on("change:a change:b", fn)` works in either; this helper just keeps the
+ * per-trait form explicit (and our test `fakeModel` enforces it as a style guard).
  */
 export function onChanges(
   model: AnyModel,
@@ -130,6 +136,34 @@ export function setByPath(model: AnyModel, path: string, value: unknown): void {
   }
   cursor[parts[parts.length - 1]] = value;
   model.set(topKey, next);
+}
+
+/**
+ * Deliver a Jupyter "custom message" to a model's frontend `msg:custom`
+ * listeners, locally and without a kernel.
+ *
+ * This lets a control widget drive another widget's comm-based behaviour (e.g.
+ * lonboard's `Map.fly_to`, which reacts to `model.on("msg:custom", …)`) in both
+ * contexts:
+ *
+ * - **Live kernel:** the target is a Backbone `WidgetModel`; `trigger("msg:custom",
+ *   content, buffers)` fires its listeners — exactly what the comm layer does
+ *   internally on a real kernel message, but with no round-trip.
+ * - **Static export:** the target is a proxy whose `receiveCustomMessage` (added
+ *   by myst-anywidget-static-export) fires the same listeners.
+ *
+ * Falls back to a no-op when neither path exists.
+ */
+export function deliverCustomMessage(
+  model: AnyModel,
+  content: unknown,
+  buffers: unknown[] = [],
+): void {
+  if (typeof model.receiveCustomMessage === "function") {
+    model.receiveCustomMessage(content, buffers); // static export
+  } else if (typeof model.trigger === "function") {
+    model.trigger("msg:custom", content, buffers); // live (Backbone)
+  }
 }
 
 // ── Static-export host registry ──────────────────────────────────────────────
@@ -195,6 +229,8 @@ export interface ModelHandle {
   save(): void;
   /** Subscribe a trait-change handler on every currently-resolvable model. */
   on(field: string, fn: (value: unknown) => void): void;
+  /** Deliver a custom message (`msg:custom`) to every matching proxy. */
+  sendCustom(content: unknown, buffers?: unknown[]): void;
 }
 
 function makeHandle(getModels: () => AnyModel[]): ModelHandle {
@@ -217,6 +253,9 @@ function makeHandle(getModels: () => AnyModel[]): ModelHandle {
     },
     on(field, fn) {
       for (const m of getModels()) m.on?.(`change:${field}`, () => fn(m.get(field)));
+    },
+    sendCustom(content, buffers = []) {
+      for (const m of getModels()) deliverCustomMessage(m, content, buffers);
     },
   };
 }
