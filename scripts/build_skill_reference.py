@@ -35,7 +35,7 @@ GROUPS: list[tuple[str, list[str]]] = [
     ("Input controls", ["slider", "range_slider", "dropdown", "toggle", "button", "number_input"]),
     ("Layout containers", ["row", "column", "grid"]),
     ("Linking", ["binder"]),
-    ("Lonboard interop", ["layer_toggle", "layer_filter", "filter_binder"]),
+    ("Lonboard interop", ["layer_toggle", "layer_filter", "filter_binder", "map_flyer"]),
 ]
 
 # Containers take their children positionally as well as via children=[...].

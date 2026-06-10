@@ -11,7 +11,7 @@ Display a widget by leaving it as the last expression in a notebook cell.
 - **Input controls:** `Slider`, `RangeSlider`, `Dropdown`, `Toggle`, `Button`, `NumberInput`
 - **Layout containers:** `Row`, `Column`, `Grid`
 - **Linking:** `Binder`
-- **Lonboard interop:** `LayerToggle`, `LayerFilter`, `FilterBinder`
+- **Lonboard interop:** `LayerToggle`, `LayerFilter`, `FilterBinder`, `MapFlyer`
 
 ## Charts & displays
 
@@ -320,4 +320,20 @@ FilterBinder(source, layer, low_field='low', high_field='high', filter_field='fi
 | `high_field` | Unicode | `'high'` | Source trait for the high bound. |
 | `filter_field` | Unicode | `'filter_range'` | Layer trait to write [low, high] to. |
 | `label` | Unicode | `''` | Optional status label. |
+| `widget_id` | Unicode | `''` | Stable unique id used for cross-widget linking (auto-assigned). |
+
+### `MapFlyer`
+
+Fly a lonboard ``Map`` to preset locations.
+
+```python
+MapFlyer(map, locations, duration=4000, label='')
+```
+
+| Trait | Type | Default | Description |
+|---|---|---|---|
+| `map` | Instance | — | The lonboard Map to reposition. |
+| `locations` | List | — | Presets; each a dict with 'label' plus camera keys (longitude, latitude, zoom, optionally pitch/bearing). |
+| `duration` | Int | `4000` | Fly-to animation duration in milliseconds. |
+| `label` | Unicode | `''` | Optional heading above the buttons. |
 | `widget_id` | Unicode | `''` | Stable unique id used for cross-widget linking (auto-assigned). |
