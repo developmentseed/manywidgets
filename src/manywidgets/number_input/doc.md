@@ -32,3 +32,9 @@ chart = Chart()
 w = NumberInput(label="Width", min=200, max=1200, value=800)
 jsdlink((w, "value"), (chart, "width"))
 ```
+
+## Styling
+
+Themed via the [styling guide](../guides/styling.md). Widget-specific token:
+
+- `--mw-control-max-width` (default `320px`) — the control's max width.

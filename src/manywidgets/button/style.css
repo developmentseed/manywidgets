@@ -1,20 +1,20 @@
 .manywidgets-button {
-  padding: 8px 18px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: var(--mw-space-3, 8px) var(--mw-space-6, 18px);
+  font-size: var(--mw-font-size-md, 14px);
+  font-weight: var(--mw-font-weight-strong, 600);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--mw-radius-sm, 6px);
   cursor: pointer;
-  background: #0366d6;
-  color: #fff;
-  margin: 10px 0;
+  background: var(--mw-color-accent, #0366d6);
+  color: var(--mw-color-on-accent, #fff);
+  margin: var(--mw-block-margin, 10px 0);
   transition: background 0.15s ease, transform 0.1s ease;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, sans-serif;
+  font-family: var(--mw-font-family, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif);
 }
 
 .manywidgets-button:hover {
-  background: #0256c7;
+  background: var(--mw-color-accent-hover, #0256c7);
 }
 
 .manywidgets-button:active {

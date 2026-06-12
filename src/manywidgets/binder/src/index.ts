@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { asNumber, resolveModel, type ModelHandle } from "@manywidgets/core";
+import { applyThemeVars, asNumber, resolveModel, type ModelHandle } from "@manywidgets/core";
 
 interface BinderModel {
   source_widget_id: string;
@@ -33,6 +33,7 @@ async function render({ model, el }: RenderProps<BinderModel>): Promise<void> {
   const status = document.createElement("div");
   status.textContent = `🔗 binder: connecting…  (${label})`;
   el.appendChild(status);
+  applyThemeVars(el, model);
 
   let source: ModelHandle;
   let target: ModelHandle;

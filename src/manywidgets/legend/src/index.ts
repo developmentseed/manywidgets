@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { onChanges } from "@manywidgets/core";
+import { applyThemeVars, onChanges } from "@manywidgets/core";
 
 type Color = string | number[];
 type Entry = [Color, string];
@@ -32,6 +32,7 @@ function render({ model, el }: RenderProps<LegendModel>): void {
   container.appendChild(titleEl);
   container.appendChild(list);
   el.appendChild(container);
+  applyThemeVars(container, model);
 
   function update(): void {
     const title = model.get("title") || "";

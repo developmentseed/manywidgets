@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { asNumber, safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, asNumber, safeSaveChanges } from "@manywidgets/core";
 
 interface ButtonModel {
   clicks: number;
@@ -13,6 +13,7 @@ function render({ model, el }: RenderProps<ButtonModel>): void {
   button.textContent = model.get("label");
 
   el.appendChild(button);
+  applyThemeVars(button, model);
 
   button.addEventListener("click", () => {
     model.set("clicks", asNumber(model.get("clicks")) + 1);

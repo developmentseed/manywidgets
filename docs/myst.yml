@@ -50,6 +50,7 @@ project:
     - title: Guides
       children:
         - file: guides/linking.md
+        - file: guides/styling.md
         - file: guides/create-your-own-widget.md
         - file: guides/static-export.md
         - file: guides/lonboard.md
@@ -57,6 +58,7 @@ project:
       children:
         - file: examples/demo.ipynb
         - file: examples/layout.ipynb
+        - file: examples/styling-examples.ipynb
         - file: examples/lonboard-map.ipynb
 site:
   template: book-theme

@@ -32,3 +32,5 @@ docs/widgets/*.ipynb
 
 # OS
 .DS_Store
+
+lonboard-viewport-control.md

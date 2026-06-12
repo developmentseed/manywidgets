@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, safeSaveChanges } from "@manywidgets/core";
 
 interface ToggleModel {
   value: boolean;
@@ -26,6 +26,7 @@ function render({ model, el }: RenderProps<ToggleModel>): void {
   container.appendChild(track);
   container.appendChild(label);
   el.appendChild(container);
+  applyThemeVars(container, model);
 
   input.addEventListener("change", () => {
     model.set("value", input.checked);

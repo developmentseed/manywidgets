@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { idOf, type ModelHandle, resolveModel, safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, idOf, type ModelHandle, resolveModel, safeSaveChanges } from "@manywidgets/core";
 
 interface LayerToggleModel {
   layer: unknown;
@@ -28,6 +28,7 @@ async function render({ model, el }: RenderProps<LayerToggleModel>): Promise<voi
 
   container.append(input, track, label);
   el.appendChild(container);
+  applyThemeVars(container, model);
 
   let handle: ModelHandle | null = null;
   try {

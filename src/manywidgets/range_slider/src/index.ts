@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { onChanges, safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, onChanges, safeSaveChanges } from "@manywidgets/core";
 
 interface RangeSliderModel {
   low: number;
@@ -39,6 +39,7 @@ function render({ model, el }: RenderProps<RangeSliderModel>): void {
   container.appendChild(header);
   container.appendChild(inputs);
   el.appendChild(container);
+  applyThemeVars(container, model);
 
   function syncBounds(): void {
     for (const input of [lowInput, highInput]) {

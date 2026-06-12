@@ -367,6 +367,38 @@ export async function renderChild(
   };
 }
 
+// ── Theme variables ──────────────────────────────────────────────────────────
+
+/**
+ * Apply the widget's `theme_vars` trait as inline CSS custom properties on `el`.
+ *
+ * `theme_vars` is a flat `{ "--mw-color-accent": "#7c3aed", … }` dict, merged on
+ * the Python side (theme + per-widget overrides), so this stays dumb: set each
+ * `--mw-*` property, and clear any that were dropped since the last update. Vars
+ * set here cascade to descendants, so a layout widget setting them on its
+ * container themes every nested child.
+ *
+ * The trait name has no leading underscore on purpose: the static-export plugin
+ * strips `_`-prefixed traits from a directly-displayed (root) widget's proxy, so
+ * a `_`-named trait would never reach a themed layout.
+ *
+ * One trait, one listener — safe under static export. Returns an unsubscribe fn.
+ */
+export function applyThemeVars(el: HTMLElement, model: AnyModel): () => void {
+  let applied: string[] = [];
+  const apply = () => {
+    const vars = (model.get("theme_vars") as Record<string, string>) || {};
+    const next = Object.keys(vars).filter((k) => k.startsWith("--mw-"));
+    for (const k of applied) {
+      if (!next.includes(k)) el.style.removeProperty(k);
+    }
+    for (const k of next) el.style.setProperty(k, String(vars[k]));
+    applied = next;
+  };
+  apply();
+  return onChange(model, "theme_vars", apply);
+}
+
 // ── Shadow-DOM-safe CSS injection ────────────────────────────────────────────
 
 /**

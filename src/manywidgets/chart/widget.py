@@ -49,6 +49,24 @@ class Chart(BaseWidget):
     chart_options = traitlets.Dict(
         {}, help="Extra Chart.js options, deep-merged into the defaults."
     ).tag(sync=True)
+    palette = traitlets.List(
+        [],
+        help=(
+            "Ordered series colors. A theme's chart_palette flows here; a "
+            "series' own color still wins, and empty falls back to the default."
+        ),
+    ).tag(sync=True)
+
+    def __init__(self, *, theme=None, palette=None, **kwargs):
+        # A canvas can't read CSS variables, so a theme's series colors arrive as
+        # a real trait rather than via _theme_vars. An explicit palette= wins.
+        if palette is None and theme is not None:
+            chart_palette = getattr(theme, "chart_palette", None)
+            if chart_palette:
+                palette = list(chart_palette)
+        if palette is not None:
+            kwargs["palette"] = palette
+        super().__init__(theme=theme, **kwargs)
 
     # Layout / labels
     width = traitlets.Int(800, help="Width in pixels.").tag(sync=True)

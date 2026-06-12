@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, safeSaveChanges } from "@manywidgets/core";
 
 type Option = string | number | [string, unknown];
 
@@ -30,6 +30,7 @@ function render({ model, el }: RenderProps<DropdownModel>): void {
   container.appendChild(label);
   container.appendChild(select);
   el.appendChild(container);
+  applyThemeVars(container, model);
 
   // We index options so the <option> value attribute (always a string) maps back
   // to the original typed value.

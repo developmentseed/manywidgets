@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { onChanges, safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, onChanges, safeSaveChanges } from "@manywidgets/core";
 
 interface SliderModel {
   value: number;
@@ -33,6 +33,7 @@ function render({ model, el }: RenderProps<SliderModel>): void {
   container.appendChild(header);
   container.appendChild(input);
   el.appendChild(container);
+  applyThemeVars(container, model);
 
   function syncBounds(): void {
     input.min = String(model.get("min"));

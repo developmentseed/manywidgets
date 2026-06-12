@@ -26,3 +26,9 @@ display(s, nd)
 ## API
 
 {api-table}
+
+## Styling
+
+Themed via the [styling guide](../guides/styling.md). Widget-specific token:
+
+- `--mw-number-display-value-size` (default `40px`) — the value's font size.
