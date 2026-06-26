@@ -1,0 +1,99 @@
+.manywidgets-mapcompare {
+  display: block;
+  margin: 10px 0;
+}
+
+.manywidgets-mapcompare__container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #e9edf0;
+  touch-action: none;
+}
+
+/* The two stacked maps fill the container; before = top, after = bottom. */
+.manywidgets-mapcompare .mc__map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.manywidgets-mapcompare .mc__map--bottom {
+  z-index: 1;
+}
+.manywidgets-mapcompare .mc__map--top {
+  z-index: 2;
+}
+
+/* lonboard's map element is sized by its own height trait (default ~500px);
+   force it (and its canvas) to fill our absolutely-positioned cell instead. */
+.manywidgets-mapcompare .mc__map > *,
+.manywidgets-mapcompare .mc__map .lonboard,
+.manywidgets-mapcompare .mc__map canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Vertical divider (default): a thin full-height bar with a round grabber. */
+.manywidgets-mapcompare .mc__handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 4px;
+  margin-left: -2px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 0 6px rgba(0, 0, 0, 0.35);
+  cursor: ew-resize;
+  z-index: 10;
+  touch-action: none;
+}
+
+.manywidgets-mapcompare .mc__handle::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 26px;
+  height: 26px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+/* A double-chevron hint inside the knob. */
+.manywidgets-mapcompare .mc__handle::after {
+  content: "‹ ›";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font: 13px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #57606a;
+  letter-spacing: -1px;
+  pointer-events: none;
+}
+
+.manywidgets-mapcompare .mc__handle--dragging {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Horizontal divider variant. */
+.manywidgets-mapcompare .mc__handle--horizontal {
+  top: 50%;
+  left: 0;
+  right: 0;
+  bottom: auto;
+  width: auto;
+  height: 4px;
+  margin-left: 0;
+  margin-top: -2px;
+  cursor: ns-resize;
+}
+
+.manywidgets-mapcompare .mc__handle--horizontal::after {
+  content: "⌃ ⌄";
+}
