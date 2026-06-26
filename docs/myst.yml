@@ -47,6 +47,7 @@ project:
         - file: widgets/filter_binder.ipynb
         - file: widgets/layer_filter.ipynb
         - file: widgets/map_flyer.ipynb
+        - file: widgets/map_compare.ipynb
     - title: Guides
       children:
         - file: guides/linking.md
@@ -58,6 +59,7 @@ project:
         - file: examples/demo.ipynb
         - file: examples/layout.ipynb
         - file: examples/lonboard-map.ipynb
+        - file: examples/map-compare.ipynb
 site:
   template: book-theme
   nav:

@@ -11,7 +11,7 @@ Display a widget by leaving it as the last expression in a notebook cell.
 - **Input controls:** `Slider`, `RangeSlider`, `Dropdown`, `Toggle`, `Button`, `NumberInput`
 - **Layout containers:** `Row`, `Column`, `Grid`
 - **Linking:** `Binder`
-- **Lonboard interop:** `LayerToggle`, `LayerFilter`, `FilterBinder`, `MapFlyer`
+- **Lonboard interop:** `LayerToggle`, `LayerFilter`, `FilterBinder`, `MapFlyer`, `MapCompare`
 
 ## Charts & displays
 
@@ -336,4 +336,23 @@ MapFlyer(map, locations, duration=4000, label='')
 | `locations` | List | — | Presets; each a dict with 'label' plus camera keys (longitude, latitude, zoom, optionally pitch/bearing). |
 | `duration` | Int | `4000` | Fly-to animation duration in milliseconds. |
 | `label` | Unicode | `''` | Optional heading above the buttons. |
+| `widget_id` | Unicode | `''` | Stable unique id used for cross-widget linking (auto-assigned). |
+
+### `MapCompare`
+
+Swipe-compare two lonboard ``Map`` widgets with synchronized cameras.
+
+```python
+MapCompare(before, after, position=0.5, orientation='vertical', sync_views=True, height='500px', initial_view='before')
+```
+
+| Trait | Type | Default | Description |
+|---|---|---|---|
+| `before` | Instance | — | Lonboard Map shown on the leading side of the swipe. |
+| `after` | Instance | — | Lonboard Map shown on the trailing side of the swipe. |
+| `position` | Float | `0.5` | Swipe divider position from 0 (start) to 1 (end). |
+| `orientation` | Unicode | `'vertical'` | Split direction: "vertical" (left/right) or "horizontal" (top/bottom). |
+| `sync_views` | Bool | `True` | Keep the two maps' cameras locked together. |
+| `height` | Unicode | `'500px'` | CSS height of the compare container. |
+| `initial_view` | Unicode | `'before'` | Which map's view_state to align to on load ("before" or "after"). |
 | `widget_id` | Unicode | `''` | Stable unique id used for cross-widget linking (auto-assigned). |

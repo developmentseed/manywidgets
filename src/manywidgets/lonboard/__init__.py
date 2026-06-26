@@ -18,6 +18,7 @@ except ImportError as exc:  # pragma: no cover - exercised via the friendly-erro
 from .filter_binder import FilterBinder
 from .layer_filter import LayerFilter
 from .layer_toggle import LayerToggle
+from .map_compare import MapCompare
 from .map_flyer import MapFlyer
 
-__all__ = ["LayerToggle", "FilterBinder", "LayerFilter", "MapFlyer"]
+__all__ = ["LayerToggle", "FilterBinder", "LayerFilter", "MapFlyer", "MapCompare"]
