@@ -1,12 +1,15 @@
 name: Release
 
-# Publishes to PyPI when a GitHub Release is published. This is NOT auto-triggered
-# by CI — a maintainer creates the Release by hand, which fires this workflow.
+# Publishes to PyPI via Trusted Publishing when a `v*` tag is pushed to `main`.
 # The JS bundles are compiled by the hatch-jupyter-builder build hook, so the
 # wheel always contains every dist/widget.js.
+#
+# To release: bump src/manywidgets/_version.py, commit to main, then push a
+# matching tag, e.g. `git tag v0.1.0 && git push origin v0.1.0`.
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
 
 jobs:
@@ -30,16 +33,26 @@ jobs:
           name: dist
           path: dist/*
 
-  publish:
-    name: Publish to PyPI
-    needs: build
+  upload_pypi:
+    name: Upload release to PyPI
+    needs: [build]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
-    environment: pypi
+    environment:
+      # Note: this environment must be configured in the repo settings and must
+      # match the environment name registered in PyPI's publishing settings.
+      name: pypi-release
+      url: https://pypi.org/p/manywidgets
     permissions:
-      id-token: write # PyPI Trusted Publishing — no API token needed
+      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
+      # Download the artifacts built above to publish.
+      # Build and publish are separate jobs so that "build" never has PyPI access.
       - uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
-      - uses: pypa/gh-action-pypi-publish@release/v1
+          merge-multiple: true
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
