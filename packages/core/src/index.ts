@@ -166,7 +166,7 @@ export function deliverCustomMessage(
   }
 }
 
-// ── Static-export host registry ──────────────────────────────────────────────
+// Static-export host registry
 
 type Registry = {
   get?: (key: string) => AnyModel | undefined;
@@ -313,7 +313,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   });
 }
 
-// ── Child rendering (layout widgets) ─────────────────────────────────────────
+// Child rendering for layout widgets
 
 const noop = (): void => {};
 
@@ -367,7 +367,225 @@ export async function renderChild(
   };
 }
 
-// ── Shadow-DOM-safe CSS injection ────────────────────────────────────────────
+// Theme variables
+
+export type HostColorMode = "light" | "dark";
+
+export const HOST_DARK_MODE_SELECTORS = [
+  ".dark",
+  ".dark-theme",
+  "[data-theme='dark']",
+  "[data-color-mode='dark']",
+] as const;
+
+export const HOST_LIGHT_MODE_SELECTORS = [
+  ".light",
+  ".light-theme",
+  "[data-theme='light']",
+  "[data-color-mode='light']",
+] as const;
+
+const THEME_DEFAULT_CSS = `
+.manywidgets-theme-defaults {
+  --mw-font-family: var(--jp-ui-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif);
+  --mw-font-family-mono: var(--jp-code-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+  --mw-font-size-sm: 12px;
+  --mw-font-size-md: 14px;
+  --mw-font-weight-strong: 600;
+  --mw-color-text: var(--myst-color-text, var(--jp-content-font-color1, #24292e));
+  --mw-color-text-muted: var(--myst-color-text-secondary, var(--jp-content-font-color2, #586069));
+  --mw-color-surface: var(--myst-color-bg, var(--jp-layout-color1, #ffffff));
+  --mw-color-surface-elevated: var(--myst-color-surface, var(--jp-layout-color2, #f6f8fa));
+  --mw-color-border: var(--myst-color-border, var(--jp-border-color2, #e1e4e8));
+  --mw-color-border-strong: var(--myst-color-border-strong, var(--jp-border-color1, #d0d7de));
+  --mw-color-accent: var(--myst-color-primary, var(--jp-brand-color1, #0366d6));
+  --mw-color-accent-hover: var(--myst-color-primary-hover, var(--jp-brand-color0, #0256c7));
+  --mw-color-accent-soft: var(--myst-color-active-bg, #ddf4ff);
+  --mw-color-on-accent: #ffffff;
+  --mw-color-code-bg: var(--myst-color-bg-secondary, var(--jp-layout-color2, #f6f8fa));
+  --mw-color-positive: var(--myst-color-success, #1a7f37);
+  --mw-color-negative: var(--myst-color-danger, #cf222e);
+  --mw-color-warning: var(--myst-color-warning, #9a6700);
+  --mw-color-info: var(--myst-color-info, var(--mw-color-accent));
+  --mw-color-focus: var(--myst-color-focus-ring, var(--mw-color-accent));
+  --mw-radius-2: 4px;
+  --mw-radius-3: 6px;
+  --mw-radius-4: 8px;
+  --mw-radius-5: 10px;
+  --mw-radius-thumb: 9999px;
+  --mw-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --mw-shadow-2: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  --mw-control-padding-x: 14px;
+  --mw-control-padding-y: 10px;
+  --mw-control-gap: 6px;
+  --mw-control-max-width: 320px;
+  --mw-control-radius: var(--mw-radius-4);
+  --mw-input-padding-x: 8px;
+  --mw-input-padding-y: 6px;
+  --mw-input-radius: var(--mw-radius-3);
+  --mw-panel-padding-x: 18px;
+  --mw-panel-padding-y: 14px;
+  --mw-panel-radius: var(--mw-radius-5);
+  --mw-stat-min-width: 140px;
+  --mw-stat-value-size: 30px;
+  --mw-number-display-value-size: 40px;
+  --mw-toggle-track-width: 40px;
+  --mw-toggle-track-height: 22px;
+  --mw-toggle-thumb-size: 18px;
+  --mw-cursor-button: pointer;
+  --mw-cursor-slider-thumb: default;
+}
+
+.manywidgets-theme-defaults[data-mw-color-mode="dark"] {
+  --mw-color-text: var(--myst-color-text, var(--jp-content-font-color1, #f0f6fc));
+  --mw-color-text-muted: var(--myst-color-text-secondary, var(--jp-content-font-color2, #8b949e));
+  --mw-color-surface: var(--myst-color-bg, var(--jp-layout-color1, #111113));
+  --mw-color-surface-elevated: var(--myst-color-surface, var(--jp-layout-color2, #18191b));
+  --mw-color-border: var(--myst-color-border, var(--jp-border-color2, #3a3f44));
+  --mw-color-border-strong: var(--myst-color-border-strong, var(--jp-border-color1, #4d5358));
+  --mw-color-accent: var(--myst-color-primary, var(--jp-brand-color1, #6b9cff));
+  --mw-color-accent-hover: var(--myst-color-primary-hover, var(--jp-brand-color0, #8bb3ff));
+  --mw-color-accent-soft: var(--myst-color-active-bg, #1d2d50);
+  --mw-color-code-bg: var(--myst-color-bg-secondary, var(--jp-layout-color2, #1f2328));
+  --mw-color-positive: var(--myst-color-success, #7ee787);
+  --mw-color-negative: var(--myst-color-danger, #ff7b72);
+  --mw-color-warning: var(--myst-color-warning, #f2cc60);
+  --mw-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --mw-shadow-2: 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+`;
+
+function readThemeVars(model: AnyModel): Record<string, unknown> {
+  const vars = model.get("theme_vars");
+  return vars && typeof vars === "object" ? vars as Record<string, unknown> : {};
+}
+
+function colorModeFromThemeVars(vars: Record<string, unknown>): HostColorMode | null {
+  const mode = vars["--mw-color-mode"];
+  if (typeof mode !== "string") return null;
+  const normalized = mode.trim().toLowerCase();
+  if (normalized === "dark" || normalized === "light") return normalized;
+  return null;
+}
+
+function elementHasSelector(el: Element, selectors: readonly string[]): boolean {
+  return selectors.some((selector) => el.matches(selector) || !!el.closest(selector));
+}
+
+function hasThemeAncestor(el: HTMLElement): boolean {
+  if (el.parentElement?.closest(".manywidgets-theme")) return true;
+  const root = el.getRootNode();
+  const host = typeof ShadowRoot !== "undefined" && root instanceof ShadowRoot ? root.host : null;
+  return !!host?.closest(".manywidgets-theme");
+}
+
+/**
+ * Detect the host page's current color mode.
+ *
+ * MyST's default themes expose dark mode through Tailwind's `.dark` class.
+ * The extra selectors cover common class/data-attribute host conventions so
+ * widgets can share one detection path in notebooks and static exports.
+ */
+export function detectHostColorMode(el: HTMLElement): HostColorMode | null {
+  const doc = el.ownerDocument;
+  const root = el.getRootNode();
+  const host = typeof ShadowRoot !== "undefined" && root instanceof ShadowRoot ? root.host : null;
+  const candidates = [el, host, doc.body, doc.documentElement].filter(
+    (candidate): candidate is Element => candidate instanceof Element,
+  );
+
+  if (candidates.some((candidate) => elementHasSelector(candidate, HOST_DARK_MODE_SELECTORS))) {
+    return "dark";
+  }
+  if (candidates.some((candidate) => elementHasSelector(candidate, HOST_LIGHT_MODE_SELECTORS))) {
+    return "light";
+  }
+
+  const colorScheme = [el, doc.documentElement]
+    .map((candidate) => getComputedStyle(candidate).colorScheme)
+    .find((value) => value && value !== "normal") || "";
+  const schemes = colorScheme.split(/\s+/);
+  if (schemes.includes("dark") && !schemes.includes("light")) return "dark";
+  if (schemes.includes("light") && !schemes.includes("dark")) return "light";
+  return null;
+}
+
+export function observeHostColorMode(el: HTMLElement, fn: () => void): () => void {
+  const doc = el.ownerDocument;
+  const root = el.getRootNode();
+  const host = typeof ShadowRoot !== "undefined" && root instanceof ShadowRoot ? root.host : null;
+  const targets = [host, doc.body, doc.documentElement].filter(
+    (target): target is Element => target instanceof Element,
+  );
+  const observer = typeof MutationObserver !== "undefined"
+    ? new MutationObserver(fn)
+    : null;
+  for (const target of targets) {
+    observer?.observe(target, {
+      attributes: true,
+      attributeFilter: ["class", "data-theme", "data-color-mode", "style"],
+    });
+  }
+
+  const media = typeof globalThis.matchMedia === "function"
+    ? globalThis.matchMedia("(prefers-color-scheme: dark)")
+    : null;
+  media?.addEventListener?.("change", fn);
+
+  return () => {
+    observer?.disconnect();
+    media?.removeEventListener?.("change", fn);
+  };
+}
+
+/**
+ * Apply a widget's `theme_vars` trait as inline manywidgets CSS custom
+ * properties on `el`.
+ *
+ * The Python side resolves `theme=` and `style=` to a flat `{ "--mw-*": value }`
+ * dict. This helper intentionally stays dumb: set each manywidgets-owned var,
+ * clear vars that disappeared and ignore any non-`--mw-*` key. Vars set here
+ * cascade to descendants, so a themed layout can theme nested widgets once
+ * individual widgets opt into this helper.
+ */
+export function applyThemeVars(el: HTMLElement, model: AnyModel): () => void {
+  let applied: string[] = [];
+  ensureShadowCss(el, THEME_DEFAULT_CSS, "manywidgets-theme-defaults");
+  el.classList.add("manywidgets-theme");
+  if (!hasThemeAncestor(el)) el.classList.add("manywidgets-theme-defaults");
+
+  const apply = () => {
+    const vars = readThemeVars(model);
+    const next = Object.keys(vars).filter((k) => k.startsWith("--mw-"));
+    for (const key of applied) {
+      if (!next.includes(key)) el.style.removeProperty(key);
+    }
+    for (const key of next) {
+      el.style.setProperty(key, String(vars[key]));
+    }
+    applied = next;
+    applyColorMode();
+  };
+
+  const applyColorMode = () => {
+    const mode = colorModeFromThemeVars(readThemeVars(model)) ?? detectHostColorMode(el);
+    if (mode) {
+      el.dataset.mwColorMode = mode;
+    } else {
+      delete el.dataset.mwColorMode;
+    }
+  };
+
+  apply();
+  const offTheme = onChange(model, "theme_vars", apply);
+  const offHost = observeHostColorMode(el, applyColorMode);
+  return () => {
+    offTheme();
+    offHost();
+  };
+}
+
+// Shadow-DOM-safe CSS injection
 
 /**
  * Inject a `<style>` block into the nearest shadow root (or document head),
