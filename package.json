@@ -10,6 +10,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
+    "tokens:gen": "node scripts/generate_radix_tokens.mjs",
+    "tokens:check": "node scripts/generate_radix_tokens.mjs --check",
     "docs:gen": "python scripts/build_widget_docs.py",
     "skill:gen": "python scripts/build_skill_reference.py",
     "serve": "python -m http.server -d docs/_build/html 3030",

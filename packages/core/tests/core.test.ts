@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  applyThemeVars,
   asNumber,
   deliverCustomMessage,
+  detectHostColorMode,
   onChanges,
   renderChild,
   resolveModel,
@@ -15,6 +17,15 @@ import {
   liveModel,
   mountEl,
 } from "@manywidgets/test-utils";
+
+afterEach(() => {
+  document.documentElement.className = "";
+  document.documentElement.removeAttribute("data-theme");
+  document.documentElement.removeAttribute("data-color-mode");
+  document.body.className = "";
+  document.body.removeAttribute("data-theme");
+  document.body.removeAttribute("data-color-mode");
+});
 
 describe("asNumber", () => {
   it("coerces and falls back", () => {
@@ -190,5 +201,97 @@ describe("renderChild", () => {
     await expect(
       renderChild({ model: fakeModel({}) } as never, "IPY_MODEL_z", mountEl()),
     ).rejects.toThrow();
+  });
+});
+
+describe("applyThemeVars", () => {
+  it("sets mw vars and ignores non-mw keys", () => {
+    const el = mountEl();
+    const m = fakeModel({
+      theme_vars: {
+        "--mw-color-mode": "dark",
+        "--mw-color-accent": "#3e63dd",
+        "--radix-accent-9": "#3e63dd",
+      },
+    });
+
+    applyThemeVars(el, m as never);
+
+    expect(el.classList.contains("manywidgets-theme")).toBe(true);
+    expect(el.dataset.mwColorMode).toBe("dark");
+    expect(el.style.getPropertyValue("--mw-color-accent")).toBe("#3e63dd");
+    expect(el.style.getPropertyValue("--radix-accent-9")).toBe("");
+  });
+
+  it("updates and removes stale vars on trait changes", () => {
+    const el = mountEl();
+    const m = fakeModel({
+      theme_vars: {
+        "--mw-color-accent": "#3e63dd",
+        "--mw-radius-4": "8px",
+      },
+    });
+
+    applyThemeVars(el, m as never);
+    m.set("theme_vars", { "--mw-color-accent": "#3358d4" });
+
+    expect(el.style.getPropertyValue("--mw-color-accent")).toBe("#3358d4");
+    expect(el.style.getPropertyValue("--mw-radius-4")).toBe("");
+  });
+
+  it("only attaches default tokens to the outer theme root", () => {
+    const parent = mountEl();
+    const child = document.createElement("div");
+    parent.appendChild(child);
+    const m = fakeModel({ theme_vars: {} });
+
+    applyThemeVars(parent, m as never);
+    applyThemeVars(child, m as never);
+
+    expect(parent.classList.contains("manywidgets-theme-defaults")).toBe(true);
+    expect(child.classList.contains("manywidgets-theme")).toBe(true);
+    expect(child.classList.contains("manywidgets-theme-defaults")).toBe(false);
+  });
+
+  it("defaults to verified MyST tokens before Jupyter and hardcoded fallbacks", () => {
+    const el = mountEl();
+    const m = fakeModel({ theme_vars: {} });
+
+    applyThemeVars(el, m as never);
+    const css = document.querySelector(
+      'style[data-manywidgets-css="manywidgets-theme-defaults"]',
+    )?.textContent ?? "";
+
+    expect(css).toContain(
+      "--mw-color-text: var(--myst-color-text, var(--jp-content-font-color1, #24292e));",
+    );
+    expect(css).toContain(
+      "--mw-color-surface: var(--myst-color-bg, var(--jp-layout-color1, #ffffff));",
+    );
+    expect(css).toContain("--mw-color-accent: var(--myst-color-primary");
+    expect(css).toContain("--mw-color-positive: var(--myst-color-success");
+    expect(css).toContain("--mw-color-negative: var(--myst-color-danger");
+    expect(css).toContain("--mw-color-focus: var(--myst-color-focus-ring");
+  });
+
+  it("detects MyST-style dark mode from the host page", () => {
+    document.documentElement.classList.add("dark");
+    const el = mountEl();
+    const m = fakeModel({ theme_vars: {} });
+
+    expect(detectHostColorMode(el)).toBe("dark");
+
+    applyThemeVars(el, m as never);
+    expect(el.dataset.mwColorMode).toBe("dark");
+  });
+
+  it("prefers explicit theme color mode over host color mode", () => {
+    document.documentElement.classList.add("dark");
+    const el = mountEl();
+    const m = fakeModel({ theme_vars: { "--mw-color-mode": "light" } });
+
+    applyThemeVars(el, m as never);
+
+    expect(el.dataset.mwColorMode).toBe("light");
   });
 });

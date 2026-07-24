@@ -32,6 +32,11 @@ KERNEL = {"display_name": "manywidgets-venv", "language": "python", "name": "man
 
 # Traits inherited from anywidget/ipywidgets that are not part of a widget's API.
 _BASE_TRAITS = set(anywidget.AnyWidget.class_traits())
+_INTERNAL_TRAITS = {
+    # User-facing theming happens through `theme=` and `style=` kwargs; this is
+    # only the resolved frontend sync payload.
+    "theme_vars",
+}
 
 # ```{code-cell} python ... ``` fenced blocks.
 _CODE_CELL_RE = re.compile(r"```\{code-cell\}[^\n]*\n(.*?)\n```", re.DOTALL)
@@ -69,6 +74,8 @@ def public_traits(cls):
             if not tr.metadata.get("sync"):
                 continue
             if name in _BASE_TRAITS and name != "widget_id":
+                continue
+            if name in _INTERNAL_TRAITS:
                 continue
             seen.add(name)
             out.append((name, tr))

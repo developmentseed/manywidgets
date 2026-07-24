@@ -16,6 +16,8 @@ from collections import defaultdict
 import anywidget
 import traitlets
 
+from .themes._theme import _normalize_vars
+
 # Per-class monotonic counters so auto-generated ids are stable and readable
 # (``chart_1``, ``chart_2``, ``slider_1``, …) within a kernel session.
 _id_counters: dict[str, int] = defaultdict(int)
@@ -61,13 +63,34 @@ class BaseWidget(anywidget.AnyWidget):
     cross-widget linking. Subclasses set their own ``_esm`` / ``_css`` (relative
     to their own file, via :func:`asset`) exactly like the golden-example
     structure.
+
+    Widgets also accept optional ``theme`` and ``style`` keyword arguments.
+    Both resolve to a flat ``{"--mw-*": value}`` dict synced to the frontend as
+    ``theme_vars``. Individual widgets opt into using those variables from their
+    own render/CSS layer.
     """
 
     widget_id = traitlets.Unicode(
         help="Stable unique id used for cross-widget linking (auto-assigned)."
     ).tag(sync=True)
 
+    theme_vars = traitlets.Dict(
+        help="Resolved manywidgets CSS custom properties from theme/style kwargs."
+    ).tag(sync=True)
+
     def __init__(self, **kwargs):
+        theme = kwargs.pop("theme", None)
+        style = kwargs.pop("style", None)
         super().__init__(**kwargs)
         if not self.widget_id:
             self.widget_id = _next_id(type(self).__name__.lower())
+
+        resolved = dict(self.theme_vars)
+        if theme is not None:
+            if not hasattr(theme, "to_vars"):
+                raise TypeError("theme must expose a to_vars() method")
+            resolved.update(_normalize_vars(theme.to_vars()))
+        if style:
+            resolved.update(_normalize_vars(style))
+        if resolved:
+            self.theme_vars = resolved
