@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { onChanges, safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, onChanges, safeSaveChanges } from "@manywidgets/core";
 import Chart from "chart.js/auto";
 
 interface Series {
@@ -83,6 +83,8 @@ function formatSeriesData(seriesData: Series[], defaultType: string) {
 }
 
 function render({ model, el }: RenderProps<ChartModel>): () => void {
+  const disposeTheme = applyThemeVars(el, model);
+
   const container = document.createElement("div");
   container.className = "manywidgets-chart";
   container.style.width = `${model.get("width")}px`;
@@ -195,7 +197,10 @@ function render({ model, el }: RenderProps<ChartModel>): () => void {
     chart?.resize();
   });
 
-  return () => chart?.destroy();
+  return () => {
+    chart?.destroy();
+    disposeTheme();
+  };
 }
 
 export default { render };
