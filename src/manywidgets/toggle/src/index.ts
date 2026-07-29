@@ -1,12 +1,14 @@
 import type { RenderProps } from "@anywidget/types";
-import { safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, safeSaveChanges } from "@manywidgets/core";
 
 interface ToggleModel {
   value: boolean;
   label: string;
 }
 
-function render({ model, el }: RenderProps<ToggleModel>): void {
+function render({ model, el }: RenderProps<ToggleModel>): () => void {
+  const disposeTheme = applyThemeVars(el, model);
+
   const container = document.createElement("label");
   container.className = "manywidgets-toggle";
 
@@ -38,6 +40,8 @@ function render({ model, el }: RenderProps<ToggleModel>): void {
   model.on("change:label", () => {
     label.textContent = model.get("label");
   });
+
+  return disposeTheme;
 }
 
 export default { render };
