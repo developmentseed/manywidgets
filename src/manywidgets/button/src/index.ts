@@ -1,12 +1,14 @@
 import type { RenderProps } from "@anywidget/types";
-import { asNumber, safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, asNumber, safeSaveChanges } from "@manywidgets/core";
 
 interface ButtonModel {
   clicks: number;
   label: string;
 }
 
-function render({ model, el }: RenderProps<ButtonModel>): void {
+function render({ model, el }: RenderProps<ButtonModel>): () => void {
+  const disposeTheme = applyThemeVars(el, model);
+
   const button = document.createElement("button");
   button.className = "manywidgets-button";
   button.type = "button";
@@ -22,6 +24,8 @@ function render({ model, el }: RenderProps<ButtonModel>): void {
   model.on("change:label", () => {
     button.textContent = model.get("label");
   });
+
+  return disposeTheme;
 }
 
 export default { render };

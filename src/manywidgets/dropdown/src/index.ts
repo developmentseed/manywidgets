@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, safeSaveChanges } from "@manywidgets/core";
 
 type Option = string | number | [string, unknown];
 
@@ -16,7 +16,9 @@ function optionValue(opt: Option): unknown {
   return Array.isArray(opt) ? opt[1] : opt;
 }
 
-function render({ model, el }: RenderProps<DropdownModel>): void {
+function render({ model, el }: RenderProps<DropdownModel>): () => void {
+  const disposeTheme = applyThemeVars(el, model);
+
   const container = document.createElement("div");
   container.className = "manywidgets-dropdown";
 
@@ -67,6 +69,8 @@ function render({ model, el }: RenderProps<DropdownModel>): void {
   model.on("change:label", () => {
     label.textContent = model.get("label");
   });
+
+  return disposeTheme;
 }
 
 export default { render };

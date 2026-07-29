@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { asNumber, onChanges, safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, asNumber, onChanges, safeSaveChanges } from "@manywidgets/core";
 
 interface NumberInputModel {
   value: number;
@@ -9,7 +9,9 @@ interface NumberInputModel {
   label: string;
 }
 
-function render({ model, el }: RenderProps<NumberInputModel>): void {
+function render({ model, el }: RenderProps<NumberInputModel>): () => void {
+  const disposeTheme = applyThemeVars(el, model);
+
   const container = document.createElement("div");
   container.className = "manywidgets-number";
 
@@ -50,6 +52,8 @@ function render({ model, el }: RenderProps<NumberInputModel>): void {
   model.on("change:label", () => {
     label.textContent = model.get("label");
   });
+
+  return disposeTheme;
 }
 
 export default { render };
