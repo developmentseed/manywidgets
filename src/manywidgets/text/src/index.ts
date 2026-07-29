@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { onChanges } from "@manywidgets/core";
+import { applyThemeVars, onChanges } from "@manywidgets/core";
 import { marked } from "marked";
 
 interface TextModel {
@@ -7,7 +7,9 @@ interface TextModel {
   markdown: boolean;
 }
 
-function render({ model, el }: RenderProps<TextModel>): void {
+function render({ model, el }: RenderProps<TextModel>): () => void {
+  const disposeTheme = applyThemeVars(el, model);
+
   const container = document.createElement("div");
   container.className = "manywidgets-text";
   el.appendChild(container);
@@ -26,6 +28,8 @@ function render({ model, el }: RenderProps<TextModel>): void {
 
   update();
   onChanges(model, ["value", "markdown"], update);
+
+  return disposeTheme;
 }
 
 export default { render };

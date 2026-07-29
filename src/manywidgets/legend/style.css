@@ -1,18 +1,17 @@
 .manywidgets-legend {
   display: inline-block;
-  padding: 10px 14px;
-  border: 1px solid #e1e4e8;
-  border-radius: 8px;
-  background: #ffffff;
+  padding: var(--mw-control-padding-y) var(--mw-control-padding-x);
+  border: 1px solid var(--mw-color-border);
+  border-radius: var(--mw-control-radius);
+  background: var(--mw-color-surface);
   margin: 10px 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, sans-serif;
+  font-family: var(--mw-font-family);
 }
 
 .manywidgets-legend__title {
-  color: #586069;
-  font-size: 12px;
-  font-weight: 600;
+  color: var(--mw-color-text-muted);
+  font-size: var(--mw-font-size-sm);
+  font-weight: var(--mw-font-weight-strong);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 6px;
@@ -41,6 +40,6 @@
 }
 
 .manywidgets-legend__label {
-  font-size: 14px;
-  color: #24292e;
+  font-size: var(--mw-font-size-md);
+  color: var(--mw-color-text);
 }
