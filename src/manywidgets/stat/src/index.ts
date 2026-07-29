@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { onChanges } from "@manywidgets/core";
+import { applyThemeVars, onChanges } from "@manywidgets/core";
 
 interface StatModel {
   label: string;
@@ -8,7 +8,9 @@ interface StatModel {
   delta: unknown;
 }
 
-function render({ model, el }: RenderProps<StatModel>): void {
+function render({ model, el }: RenderProps<StatModel>): () => void {
+  const disposeTheme = applyThemeVars(el, model);
+
   const card = document.createElement("div");
   card.className = "manywidgets-stat";
 
@@ -52,6 +54,8 @@ function render({ model, el }: RenderProps<StatModel>): void {
 
   update();
   onChanges(model, ["label", "value", "unit", "delta"], update);
+
+  return disposeTheme;
 }
 
 export default { render };
