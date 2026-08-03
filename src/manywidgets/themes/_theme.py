@@ -11,7 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field, fields, replace
 from typing import Mapping
 
-_NON_VAR_FIELDS = {"chart_palette", "tokens"}
+_NON_VAR_FIELDS = {"palette", "tokens"}
 _MW_PREFIX = "--mw-"
 
 
@@ -163,8 +163,7 @@ class Theme:
     panel_radius: str | None = None
     stat_value_size: str | None = None
 
-    # Non-DOM renderers need explicit values instead of CSS variables.
-    chart_palette: list[str] | None = None
+    palette: list[str] | None = None
 
     # Escape hatch for any other manywidgets-owned CSS custom property.
     tokens: Mapping[str, object] = field(default_factory=dict)
@@ -173,7 +172,14 @@ class Theme:
         object.__setattr__(self, "tokens", _normalize_vars(self.tokens))
 
     def to_vars(self) -> dict[str, str]:
-        """Serialize set fields to a flat ``{"--mw-*": value}`` dict."""
+        """Serialize set fields to a flat ``{"--mw-*": value}`` dict.
+
+        ``palette`` is a list, not a single CSS value, so it expands into
+        indexed ``--mw-palette-N`` tokens (plus a ``--mw-palette-size`` count).
+        A non-DOM renderer resolves those back via its own small adapter over
+        ``@manywidgets/core``'s ``resolveThemePalette``. See
+        ``src/manywidgets/chart/src/theme.ts`` for the Chart.js one.
+        """
         out: dict[str, str] = dict(self.tokens)
         for f in fields(self):
             if f.name in _NON_VAR_FIELDS:
@@ -181,6 +187,10 @@ class Theme:
             value = getattr(self, f.name)
             if value is not None:
                 out[_MW_PREFIX + f.name.replace("_", "-")] = str(value)
+        if self.palette:
+            out[_MW_PREFIX + "palette-size"] = str(len(self.palette))
+            for i, color in enumerate(self.palette, start=1):
+                out[f"{_MW_PREFIX}palette-{i}"] = str(color)
         return out
 
     def extend(self, **overrides: object) -> "Theme":
@@ -215,7 +225,7 @@ class Theme:
                 if f.name not in _NON_VAR_FIELDS and getattr(theme, f.name) is not None
             }
             overrides["tokens"] = {**result.tokens, **theme.tokens}
-            if theme.chart_palette is not None:
-                overrides["chart_palette"] = list(theme.chart_palette)
+            if theme.palette is not None:
+                overrides["palette"] = list(theme.palette)
             result = replace(result, **overrides)
         return result
