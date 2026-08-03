@@ -77,4 +77,53 @@ describe("Chart", () => {
     expect(instances.length).toBe(before);
     expect(model.get("title")).toBe("Hello");
   });
+
+  it("colors datasets from the theme palette, not a hardcoded array", () => {
+    const el = mountEl();
+    const model = fakeModel(
+      baseState({
+        theme_vars: {
+          "--mw-palette-size": "2",
+          "--mw-palette-1": "#123456",
+          "--mw-palette-2": "#abcdef",
+        },
+        series_data: [
+          { name: "a", data: [[0, 1]] },
+          { name: "b", data: [[0, 2]] },
+        ],
+      }),
+    );
+    widget.render({ model, el } as never);
+
+    const chart = instances[instances.length - 1] as { data: { datasets: Array<{ borderColor: string }> } };
+    expect(chart.data.datasets[0].borderColor).toBe("#123456");
+    expect(chart.data.datasets[1].borderColor).toBe("#abcdef");
+  });
+
+  it("an explicit per-series color still overrides the theme palette", () => {
+    const el = mountEl();
+    const model = fakeModel(
+      baseState({
+        theme_vars: { "--mw-palette-size": "1", "--mw-palette-1": "#123456" },
+        series_data: [{ name: "a", color: "#ff00ff", data: [[0, 1]] }],
+      }),
+    );
+    widget.render({ model, el } as never);
+
+    const chart = instances[instances.length - 1] as { data: { datasets: Array<{ borderColor: string }> } };
+    expect(chart.data.datasets[0].borderColor).toBe("#ff00ff");
+  });
+
+  it("rebuilds chart options (not just redraw) when theme_vars changes", () => {
+    const el = mountEl();
+    const model = fakeModel(
+      baseState({ theme_vars: { "--mw-color-text": "#111111" } }),
+    );
+    widget.render({ model, el } as never);
+
+    model.set("theme_vars", { "--mw-color-text": "#222222" });
+
+    const chart = instances[instances.length - 1] as { options: { color: string } };
+    expect(chart.options).toHaveProperty("color");
+  });
 });
