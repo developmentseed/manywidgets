@@ -608,3 +608,106 @@ export function ensureShadowCss(el: HTMLElement, cssText: string, key: string): 
   style.textContent = cssText;
   container.appendChild(style);
 }
+
+// Non-DOM renderer theme resolution. A canvas/WebGL widget never reads CSS,
+// so it resolves the --mw-* values it needs into plain JS. Core only provides
+// the primitives below; see chart/src/theme.ts for how one widget uses them.
+
+/**
+ * Resolve a `--mw-*` custom property to its used value.
+ *
+ * A direct `getComputedStyle(el).getPropertyValue(varName)` leaves nested
+ * `var()` references unsubstituted, so tokens like `--mw-color-text` that
+ * fall back through `--myst-*`/`--jp-*` chains come back unresolved.
+ * Assigning the same expression to a real CSS property forces the browser to
+ * resolve it. See
+ * https://css-tricks.com/making-sense-of-custom-properties-runtime-values/.
+ *
+ * One hidden probe per `(el, cssProperty)` is created once and reused,
+ * instead of inserted and removed on every call.
+ */
+function getProbe(el: HTMLElement, cssProperty: string): HTMLElement {
+  const attr = `data-mw-probe-${cssProperty}`;
+  const existing = el.querySelector<HTMLElement>(`:scope > [${attr}]`);
+  if (existing) return existing;
+  const probe = document.createElement("span");
+  probe.style.cssText = "display:none;";
+  probe.setAttribute(attr, "");
+  el.appendChild(probe);
+  return probe;
+}
+
+function resolveCssVar(el: HTMLElement, cssProperty: string, varExpression: string, fallback: string): string {
+  const probe = getProbe(el, cssProperty);
+  probe.style.setProperty(cssProperty, `var(${varExpression}, ${fallback})`);
+  const value = getComputedStyle(probe).getPropertyValue(cssProperty).trim();
+  // Environments with no CSS custom-property support in getComputedStyle
+  // (notably jsdom) hand the var() expression back verbatim.
+  return value && !value.includes("var(") ? value : fallback;
+}
+
+/** Resolve a `--mw-*` token as a used color (e.g. `--mw-color-text`). */
+export function resolveThemeColor(el: HTMLElement, varName: string, fallback: string): string {
+  return resolveCssVar(el, "color", varName, fallback);
+}
+
+/** Resolve a `--mw-*` token as a used font family. */
+export function resolveThemeFontFamily(el: HTMLElement, varName: string, fallback: string): string {
+  return resolveCssVar(el, "font-family", varName, fallback);
+}
+
+/** Resolve a `--mw-*` token as a used font weight (e.g. `600`, `"bold"`). */
+export function resolveThemeFontWeight(el: HTMLElement, varName: string, fallback: string): string {
+  return resolveCssVar(el, "font-weight", varName, fallback);
+}
+
+/** Resolve a `--mw-*` font-size token to its used pixel value. */
+export function resolveThemeFontSize(el: HTMLElement, varName: string, fallback: number): number {
+  const n = Number.parseFloat(resolveCssVar(el, "font-size", varName, `${fallback}px`));
+  return Number.isFinite(n) ? n : fallback;
+}
+
+export interface ResolveThemePaletteOptions {
+  /** Used for every entry the cascade doesn't override. Required, core has no default palette. */
+  fallback: string[];
+  /** Custom property naming the palette length. Defaults to `--mw-palette-size`. */
+  sizeVar?: string;
+  /** Maps a 1-based index to its custom property name. Defaults to `--mw-palette-{i}`. */
+  colorVar?: (index: number) => string;
+}
+
+/**
+ * Resolve an indexed categorical palette (by default `--mw-palette-1`,
+ * `--mw-palette-2`, and so on, sized by `--mw-palette-size`) into a plain
+ * array. Reads the custom properties directly, unlike {@link
+ * resolveThemeColor}, since `Theme.to_vars()` only ever writes literal
+ * colors here.
+ */
+export function resolveThemePalette(el: HTMLElement, options: ResolveThemePaletteOptions): string[] {
+  const { fallback, sizeVar = "--mw-palette-size", colorVar = (i: number) => `--mw-palette-${i}` } = options;
+  const computed = getComputedStyle(el);
+  const size = Number.parseInt(computed.getPropertyValue(sizeVar).trim(), 10);
+  const count = Number.isFinite(size) && size > 0 ? size : fallback.length;
+  const palette: string[] = [];
+  for (let i = 1; i <= count; i++) {
+    const literal = computed.getPropertyValue(colorVar(i)).trim();
+    palette.push(literal || fallback[(i - 1) % fallback.length]);
+  }
+  return palette;
+}
+
+type ThemeFieldResolver<T> = (el: HTMLElement) => T;
+
+/** Turn a `{ field: (el) => value }` map into a single `(el) => theme` function. */
+export function defineThemeReader<T extends object>(
+  resolvers: { [K in keyof T]: ThemeFieldResolver<T[K]> },
+): (el: HTMLElement) => T {
+  const entries = Object.entries(resolvers) as [keyof T, ThemeFieldResolver<T[keyof T]>][];
+  return (el: HTMLElement): T => {
+    const theme = {} as T;
+    for (const [field, resolve] of entries) {
+      theme[field] = resolve(el);
+    }
+    return theme;
+  };
+}
