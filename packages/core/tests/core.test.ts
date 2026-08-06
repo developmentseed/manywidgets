@@ -2,11 +2,15 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   applyThemeVars,
   asNumber,
+  defineThemeReader,
   deliverCustomMessage,
   detectHostColorMode,
   onChanges,
   renderChild,
   resolveModel,
+  resolveThemeColor,
+  resolveThemeFontSize,
+  resolveThemePalette,
   safeSaveChanges,
   setByPath,
 } from "@manywidgets/core";
@@ -293,5 +297,109 @@ describe("applyThemeVars", () => {
     applyThemeVars(el, m as never);
 
     expect(el.dataset.mwColorMode).toBe("light");
+  });
+});
+
+describe("resolveThemePalette", () => {
+  it("reads an explicit palette and size from --mw-palette-* custom properties", () => {
+    const el = mountEl();
+    const m = fakeModel({
+      theme_vars: {
+        "--mw-palette-size": "3",
+        "--mw-palette-1": "#111111",
+        "--mw-palette-2": "#222222",
+        "--mw-palette-3": "#333333",
+        "--mw-palette-4": "#444444",
+      },
+    });
+    applyThemeVars(el, m as never);
+
+    expect(resolveThemePalette(el, { fallback: ["#000000"] })).toEqual([
+      "#111111", "#222222", "#333333",
+    ]);
+  });
+
+  it("falls back to the caller-supplied palette when no tokens are set", () => {
+    const el = mountEl();
+    const m = fakeModel({ theme_vars: {} });
+    applyThemeVars(el, m as never);
+
+    expect(resolveThemePalette(el, { fallback: ["#aaaaaa", "#bbbbbb"] })).toEqual([
+      "#aaaaaa", "#bbbbbb",
+    ]);
+  });
+
+  it("supports a custom var namespace", () => {
+    const el = mountEl();
+    const m = fakeModel({
+      theme_vars: { "--mw-map-size": "2", "--mw-map-1": "#123123", "--mw-map-2": "#456456" },
+    });
+    applyThemeVars(el, m as never);
+
+    const palette = resolveThemePalette(el, {
+      fallback: ["#000000"],
+      sizeVar: "--mw-map-size",
+      colorVar: (i) => `--mw-map-${i}`,
+    });
+    expect(palette).toEqual(["#123123", "#456456"]);
+  });
+});
+
+describe("resolveThemeColor / resolveThemeFontSize", () => {
+  it("return the caller-supplied fallback", () => {
+    const el = mountEl();
+    const m = fakeModel({ theme_vars: {} });
+    applyThemeVars(el, m as never);
+
+    expect(resolveThemeColor(el, "--mw-color-text", "#123456")).toBe("#123456");
+    expect(resolveThemeFontSize(el, "--mw-font-size-md", 14)).toBe(14);
+  });
+
+  it("reuses one hidden probe per property instead of inserting/removing on every call", () => {
+    const el = mountEl();
+    const m = fakeModel({ theme_vars: {} });
+    applyThemeVars(el, m as never);
+
+    resolveThemeColor(el, "--mw-color-text", "#111111");
+    resolveThemeColor(el, "--mw-color-text-muted", "#222222");
+    resolveThemeColor(el, "--mw-color-border", "#333333");
+    resolveThemeFontSize(el, "--mw-font-size-md", 14);
+    resolveThemeFontSize(el, "--mw-font-size-sm", 12);
+
+    expect(el.querySelectorAll("[data-mw-probe-color]").length).toBe(1);
+    expect(el.querySelectorAll("[data-mw-probe-font-size]").length).toBe(1);
+  });
+});
+
+describe("defineThemeReader", () => {
+  it("runs each field's resolver and assembles the result", () => {
+    const el = mountEl();
+    const m = fakeModel({ theme_vars: {} });
+    applyThemeVars(el, m as never);
+
+    interface FakeTheme {
+      textColor: string;
+      count: number;
+    }
+    const readFakeTheme = defineThemeReader<FakeTheme>({
+      textColor: (target) => resolveThemeColor(target, "--mw-color-text", "#abcdef"),
+      count: () => 42,
+    });
+
+    expect(readFakeTheme(el)).toEqual({ textColor: "#abcdef", count: 42 });
+  });
+
+  it("re-runs resolvers on every call, not just once", () => {
+    const el = mountEl();
+    let calls = 0;
+    const readFakeTheme = defineThemeReader<{ value: number }>({
+      value: () => {
+        calls += 1;
+        return calls;
+      },
+    });
+
+    expect(readFakeTheme(el)).toEqual({ value: 1 });
+    expect(readFakeTheme(el)).toEqual({ value: 2 });
   });
 });

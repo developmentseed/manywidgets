@@ -1,12 +1,11 @@
 .manywidgets-range {
-  padding: 10px 14px;
-  border: 1px solid #e1e4e8;
-  border-radius: 8px;
-  background: #ffffff;
-  max-width: 320px;
+  padding: var(--mw-control-padding-y) var(--mw-control-padding-x);
+  border: 1px solid var(--mw-color-border);
+  border-radius: var(--mw-control-radius);
+  background: var(--mw-color-surface);
+  max-width: var(--mw-control-max-width);
   margin: 10px 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, sans-serif;
+  font-family: var(--mw-font-family);
   box-sizing: border-box;
 }
 
@@ -18,14 +17,14 @@
 }
 
 .manywidgets-range__label {
-  color: #24292e;
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--mw-color-text);
+  font-size: var(--mw-font-size-md);
+  font-weight: var(--mw-font-weight-strong);
 }
 
 .manywidgets-range__value {
-  color: #0366d6;
-  font-size: 14px;
+  color: var(--mw-color-accent);
+  font-size: var(--mw-font-size-md);
   font-variant-numeric: tabular-nums;
 }
 
@@ -36,5 +35,6 @@
 
 .manywidgets-range__input {
   width: 100%;
-  accent-color: #0366d6;
+  accent-color: var(--mw-color-accent);
+  cursor: var(--mw-cursor-slider-thumb);
 }

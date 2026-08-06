@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { onChanges } from "@manywidgets/core";
+import { applyThemeVars, onChanges } from "@manywidgets/core";
 
 type Color = string | number[];
 type Entry = [Color, string];
@@ -19,7 +19,9 @@ function toCss(color: Color): string {
   return "transparent";
 }
 
-function render({ model, el }: RenderProps<LegendModel>): void {
+function render({ model, el }: RenderProps<LegendModel>): () => void {
+  const disposeTheme = applyThemeVars(el, model);
+
   const container = document.createElement("div");
   container.className = "manywidgets-legend";
 
@@ -57,6 +59,8 @@ function render({ model, el }: RenderProps<LegendModel>): void {
 
   update();
   onChanges(model, ["entries", "title"], update);
+
+  return disposeTheme;
 }
 
 export default { render };

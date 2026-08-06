@@ -425,7 +425,7 @@ def radix_theme(
     tokens.update(RADIX_RADIUS_PRESETS[radius])
     tokens["--mw-scaling"] = RADIX_SCALING_PRESETS[scaling]
 
-    return Theme(tokens=tokens, chart_palette=_chart_palette(appearance))
+    return Theme(tokens=tokens, palette=_palette(appearance))
 
 
 def light_theme(
@@ -494,7 +494,7 @@ def _focus_tokens() -> dict[str, str]:
     return tokens
 
 
-def _chart_palette(appearance: str) -> list[str]:
+def _palette(appearance: str) -> list[str]:
     return list(_LIGHT_CHART_PALETTE if appearance == "light" else _DARK_CHART_PALETTE)
 
 

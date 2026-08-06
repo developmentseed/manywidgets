@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { onChanges, safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, onChanges, safeSaveChanges } from "@manywidgets/core";
 
 interface SliderModel {
   value: number;
@@ -9,7 +9,9 @@ interface SliderModel {
   label: string;
 }
 
-function render({ model, el }: RenderProps<SliderModel>): void {
+function render({ model, el }: RenderProps<SliderModel>): () => void {
+  const disposeTheme = applyThemeVars(el, model);
+
   const container = document.createElement("div");
   container.className = "manywidgets-slider";
 
@@ -61,6 +63,8 @@ function render({ model, el }: RenderProps<SliderModel>): void {
   model.on("change:label", () => {
     label.textContent = model.get("label");
   });
+
+  return disposeTheme;
 }
 
 export default { render };

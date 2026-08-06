@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { asNumber } from "@manywidgets/core";
+import { applyThemeVars, asNumber } from "@manywidgets/core";
 
 interface NumberDisplayModel {
   value: number;
@@ -42,7 +42,9 @@ export function formatNumber(n: number, spec: string): string {
 
 const easeOut = (p: number) => 1 - Math.pow(1 - p, 3);
 
-function render({ model, el }: RenderProps<NumberDisplayModel>): void {
+function render({ model, el }: RenderProps<NumberDisplayModel>): () => void {
+  const disposeTheme = applyThemeVars(el, model);
+
   const container = document.createElement("div");
   container.className = "manywidgets-numberdisplay";
 
@@ -95,6 +97,8 @@ function render({ model, el }: RenderProps<NumberDisplayModel>): void {
   model.on("change:label", () => {
     labelEl.textContent = model.get("label");
   });
+
+  return disposeTheme;
 }
 
 export default { render };

@@ -1,6 +1,7 @@
 import type { RenderProps } from "@anywidget/types";
-import { onChanges, safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, observeHostColorMode, onChange, onChanges, safeSaveChanges } from "@manywidgets/core";
 import Chart from "chart.js/auto";
+import { readChartTheme, type ChartTheme } from "./theme";
 
 interface Series {
   type?: string;
@@ -37,14 +38,9 @@ interface ChartModel {
   hover_point: PointEvent | Record<string, never>;
 }
 
-const PALETTE = [
-  "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
-  "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf",
-];
-
-function formatSeriesData(seriesData: Series[], defaultType: string) {
+function formatSeriesData(seriesData: Series[], defaultType: string, palette: string[]) {
   return (seriesData || []).map((series, index) => {
-    const color = series.color || PALETTE[index % PALETTE.length];
+    const color = series.color || palette[index % palette.length];
     const type = series.type || defaultType || "line";
 
     let data: unknown;
@@ -83,6 +79,8 @@ function formatSeriesData(seriesData: Series[], defaultType: string) {
 }
 
 function render({ model, el }: RenderProps<ChartModel>): () => void {
+  const disposeTheme = applyThemeVars(el, model);
+
   const container = document.createElement("div");
   container.className = "manywidgets-chart";
   container.style.width = `${model.get("width")}px`;
@@ -111,15 +109,26 @@ function render({ model, el }: RenderProps<ChartModel>): () => void {
       safeSaveChanges(model);
     };
 
-  function buildOptions(): Record<string, unknown> {
+  function buildOptions(theme: ChartTheme): Record<string, unknown> {
     const options: Record<string, unknown> = {
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: model.get("animation_enabled") ? 750 : 0 },
       interaction: { mode: "nearest", intersect: false, axis: "x" },
+      color: theme.textColor,
+      font: { family: theme.fontFamily, size: theme.fontSize },
       plugins: {
-        title: { display: !!model.get("title"), text: model.get("title"), font: { size: 16 } },
-        legend: { display: model.get("legend_enabled") !== false, position: "top" },
+        title: {
+          display: !!model.get("title"),
+          text: model.get("title"),
+          color: theme.textColor,
+          font: { family: theme.fontFamily, size: theme.fontSize + 2, weight: theme.fontWeightStrong },
+        },
+        legend: {
+          display: model.get("legend_enabled") !== false,
+          position: "top",
+          labels: { color: theme.textColor, font: { family: theme.fontFamily, size: theme.fontSizeSmall } },
+        },
         tooltip: {
           enabled: model.get("tooltips_enabled") !== false,
           mode: "index",
@@ -130,9 +139,25 @@ function render({ model, el }: RenderProps<ChartModel>): () => void {
         x: {
           type: "linear",
           position: "bottom",
-          title: { display: !!model.get("x_label"), text: model.get("x_label") },
+          title: {
+            display: !!model.get("x_label"),
+            text: model.get("x_label"),
+            color: theme.mutedColor,
+            font: { family: theme.fontFamily },
+          },
+          ticks: { color: theme.mutedColor, font: { family: theme.fontFamily, size: theme.fontSizeSmall } },
+          grid: { color: theme.gridColor },
         },
-        y: { title: { display: !!model.get("y_label"), text: model.get("y_label") } },
+        y: {
+          title: {
+            display: !!model.get("y_label"),
+            text: model.get("y_label"),
+            color: theme.mutedColor,
+            font: { family: theme.fontFamily },
+          },
+          ticks: { color: theme.mutedColor, font: { family: theme.fontFamily, size: theme.fontSizeSmall } },
+          grid: { color: theme.gridColor },
+        },
       },
       onClick: emitPoint("clicked_point"),
       onHover: emitPoint("hover_point"),
@@ -149,21 +174,27 @@ function render({ model, el }: RenderProps<ChartModel>): () => void {
 
   function build(): void {
     chart?.destroy();
+    const theme = readChartTheme(el);
     chart = new Chart(canvas, {
       type: (model.get("chart_type") || "line") as never,
-      data: { datasets: formatSeriesData(model.get("series_data"), model.get("chart_type")) as never },
-      options: buildOptions() as never,
+      data: {
+        datasets: formatSeriesData(model.get("series_data"), model.get("chart_type"), theme.palette) as never,
+      },
+      options: buildOptions(theme) as never,
     });
   }
 
   function createOrUpdate(): void {
     if (!chart) {
       build();
-    } else {
-      chart.data = { datasets: formatSeriesData(model.get("series_data"), model.get("chart_type")) as never };
-      chart.options = buildOptions() as never;
-      chart.update();
+      return;
     }
+    const theme = readChartTheme(el);
+    chart.data = {
+      datasets: formatSeriesData(model.get("series_data"), model.get("chart_type"), theme.palette) as never,
+    };
+    chart.options = buildOptions(theme) as never;
+    chart.update();
   }
 
   if ((model.get("series_data") || []).length > 0) build();
@@ -195,7 +226,15 @@ function render({ model, el }: RenderProps<ChartModel>): () => void {
     chart?.resize();
   });
 
-  return () => chart?.destroy();
+  const offThemeChange = onChange(model, "theme_vars", createOrUpdate);
+  const offHostColorMode = observeHostColorMode(el, createOrUpdate);
+
+  return () => {
+    chart?.destroy();
+    offThemeChange();
+    offHostColorMode();
+    disposeTheme();
+  };
 }
 
 export default { render };

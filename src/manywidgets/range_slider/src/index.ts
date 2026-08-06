@@ -1,5 +1,5 @@
 import type { RenderProps } from "@anywidget/types";
-import { onChanges, safeSaveChanges } from "@manywidgets/core";
+import { applyThemeVars, onChanges, safeSaveChanges } from "@manywidgets/core";
 
 interface RangeSliderModel {
   low: number;
@@ -10,7 +10,9 @@ interface RangeSliderModel {
   label: string;
 }
 
-function render({ model, el }: RenderProps<RangeSliderModel>): void {
+function render({ model, el }: RenderProps<RangeSliderModel>): () => void {
+  const disposeTheme = applyThemeVars(el, model);
+
   const container = document.createElement("div");
   container.className = "manywidgets-range";
 
@@ -84,6 +86,8 @@ function render({ model, el }: RenderProps<RangeSliderModel>): void {
   model.on("change:label", () => {
     label.textContent = model.get("label");
   });
+
+  return disposeTheme;
 }
 
 export default { render };

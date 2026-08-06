@@ -22,6 +22,29 @@ def test_theme_rejects_non_mw_tokens():
         Theme.from_vars({"--radix-shadow-3": "0 3px 12px #0002"})
 
 
+def test_palette_serializes_to_indexed_vars():
+    vars_ = Theme(palette=["#111111", "#222222"]).to_vars()
+
+    assert vars_["--mw-palette-size"] == "2"
+    assert vars_["--mw-palette-1"] == "#111111"
+    assert vars_["--mw-palette-2"] == "#222222"
+    assert "--mw-palette-3" not in vars_
+
+
+def test_plain_theme_has_no_palette_vars():
+    assert Theme().to_vars() == {}
+
+
+def test_radix_theme_includes_appearance_matched_palette():
+    light_vars = light.to_vars()
+    dark_vars = dark.to_vars()
+
+    assert light_vars["--mw-palette-size"] == "10"
+    assert light_vars["--mw-palette-1"] == "#3e63dd"
+    assert dark_vars["--mw-palette-1"] == "#9eb1ff"
+    assert light_vars["--mw-palette-1"] != dark_vars["--mw-palette-1"]
+
+
 def test_extend_overrides_and_merges_tokens():
     base = Theme(color_accent="#000", tokens={"--mw-radius-4": "8px"})
     out = base.extend(color_accent="#fff", tokens={"--mw-shadow-2": "none"})

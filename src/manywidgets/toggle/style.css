@@ -3,9 +3,8 @@
   align-items: center;
   gap: 10px;
   margin: 10px 0;
-  cursor: pointer;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, sans-serif;
+  cursor: var(--mw-cursor-button);
+  font-family: var(--mw-font-family);
   user-select: none;
 }
 
@@ -18,10 +17,10 @@
 
 .manywidgets-toggle__track {
   position: relative;
-  width: 40px;
-  height: 22px;
-  border-radius: 11px;
-  background: #d0d7de;
+  width: var(--mw-toggle-track-width);
+  height: var(--mw-toggle-track-height);
+  border-radius: var(--mw-radius-thumb);
+  background: var(--mw-color-border-strong);
   transition: background 0.2s ease;
   flex: none;
 }
@@ -31,16 +30,16 @@
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #fff;
+  width: var(--mw-toggle-thumb-size);
+  height: var(--mw-toggle-thumb-size);
+  border-radius: var(--mw-radius-thumb);
+  background: var(--mw-color-surface);
   transition: transform 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--mw-shadow-1);
 }
 
 .manywidgets-toggle__input:checked + .manywidgets-toggle__track {
-  background: #0366d6;
+  background: var(--mw-color-accent);
 }
 
 .manywidgets-toggle__input:checked + .manywidgets-toggle__track::after {
@@ -48,7 +47,7 @@
 }
 
 .manywidgets-toggle__label {
-  color: #24292e;
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--mw-color-text);
+  font-size: var(--mw-font-size-md);
+  font-weight: var(--mw-font-weight-strong);
 }
