@@ -1,0 +1,92 @@
+.manywidgets-fullscreen {
+  display: block;
+}
+
+.mwfs__inline {
+  position: relative;
+}
+
+.manywidgets-fullscreen.mwfs--open .mwfs__inline {
+  display: none;
+}
+
+/* Small ghost icon buttons: expand (over the inline child) and close (overlay). */
+.mwfs__expand,
+.mwfs__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--mw-font-size-md);
+  font-family: var(--mw-font-family);
+  color: var(--mw-color-text-muted);
+  background: var(--mw-color-surface);
+  border: 1px solid var(--mw-color-border);
+  border-radius: var(--mw-radius-3);
+  cursor: var(--mw-cursor-button);
+  z-index: 10;
+}
+
+.mwfs__expand:hover,
+.mwfs__close:hover {
+  color: var(--mw-color-text);
+  border-color: var(--mw-color-border-strong);
+}
+
+/* Viewport-covering overlay. Hidden unless the root carries .mwfs--open.
+   --mw-color-overlay is defined only by the radix theme, hence the fallback. */
+.mwfs__overlay {
+  display: none;
+}
+
+.manywidgets-fullscreen.mwfs--open .mwfs__overlay {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  /* Above notebook/MyST content; below JupyterLab's own dialogs (10000+). */
+  z-index: 9999;
+  padding: 24px;
+  box-sizing: border-box;
+  background: var(--mw-color-overlay, rgba(0, 0, 0, 0.5));
+}
+
+.mwfs__content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--mw-panel-padding-y) var(--mw-panel-padding-x);
+  border-radius: var(--mw-panel-radius);
+  background: var(--mw-color-surface, #fff);
+  box-shadow: var(--mw-shadow-1);
+}
+
+.mwfs__content > * {
+  min-height: 0;
+}
+
+.mwfs__content > .mwfs__slot {
+  height: 100%;
+}
+
+/* A directly-expanded child (no alternate layout) should actually grow: span
+   the overlay's width, and for charts — whose container carries fixed inline
+   pixel sizes — fill the height too (scoped !important, as in map_compare). */
+.manywidgets-fullscreen.mwfs--open .mwfs__content > .mwfs__slot > * {
+  width: 100% !important;
+}
+
+.manywidgets-fullscreen.mwfs--open .mwfs__slot .manywidgets-chart {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.mwfs__close {
+  top: 32px;
+  right: 32px;
+  z-index: 1;
+}
