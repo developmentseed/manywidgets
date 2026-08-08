@@ -61,6 +61,7 @@ project:
         - file: examples/layout.ipynb
         - file: examples/lonboard-map.ipynb
         - file: examples/map-compare.ipynb
+        - file: examples/fullscreen-dashboard.ipynb
 site:
   template: book-theme
   nav:

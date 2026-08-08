@@ -82,3 +82,6 @@ Fullscreen(chart, fullscreen=dashboard, widget_id="ndvi-dashboard")
 - The same widget instance can appear both inline and in the `fullscreen=`
   layout — the inline view is hidden while the overlay is open, and trait
   changes stay in sync between the two.
+
+See the [fullscreen dashboard example](../examples/fullscreen-dashboard.ipynb)
+for a lonboard map + chart + controls layout behind a single inline chart.
