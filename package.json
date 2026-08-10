@@ -1,6 +1,6 @@
 {
   "name": "manywidgets",
-  "version": "0.1.0",
+  "version": "0.2.0a1",
   "private": true,
   "description": "Build pipeline for the manywidgets anywidget bundles (esbuild over each widget + the shared @manywidgets/core module).",
   "type": "module",
