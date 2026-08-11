@@ -100,4 +100,21 @@ describe("Grid", () => {
       "200px 1fr",
     );
   });
+
+  it("applies template_rows and height so a row can grow beyond its content", async () => {
+    const host = fakeHost();
+    const el = mountEl();
+    const model = fakeModel({
+      children: [],
+      columns: 2,
+      gap: "8px",
+      template_rows: "auto 1fr auto",
+      height: "500px",
+    });
+    await widget.render({ model, el, host } as never);
+
+    const container = el.querySelector<HTMLElement>(".manywidgets-grid")!;
+    expect(container.style.gridTemplateRows).toBe("auto 1fr auto");
+    expect(container.style.height).toBe("500px");
+  });
 });

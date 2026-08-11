@@ -45,6 +45,19 @@ class Grid(BaseWidget):
             "place by their area name instead of row-major flow."
         ),
     ).tag(sync=True)
+    template_rows = traitlets.Unicode(
+        "",
+        help=(
+            "Optional CSS grid-template-rows track string (e.g. "
+            '"auto 1fr auto") to size rows unequally, e.g. a thin header/footer '
+            "with a tall middle row. Rows default to auto-sizing (fit content) "
+            "when unset. \"fr\" tracks need Grid's own height set for there to "
+            "be extra space to distribute."
+        ),
+    ).tag(sync=True)
+    height = traitlets.Unicode(
+        "", help="Optional CSS height (e.g. \"600px\", \"100vh\")."
+    ).tag(sync=True)
 
     _myst_child_traits = traitlets.List(["children"]).tag(sync=True)
 

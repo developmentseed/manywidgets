@@ -6,6 +6,8 @@ interface GridModel {
   columns: number | string;
   gap: string;
   template_areas: string;
+  template_rows: string;
+  height: string;
 }
 
 function columnsTracks(columns: number | string): string {
@@ -38,6 +40,8 @@ async function render(args: RenderProps<GridModel>): Promise<() => void> {
     container.style.display = "grid";
     container.style.gridTemplateColumns = columnsTracks(model.get("columns"));
     container.style.gridTemplateAreas = areas || "";
+    container.style.gridTemplateRows = model.get("template_rows") || "";
+    container.style.height = model.get("height") || "";
     container.style.gap = model.get("gap") || "8px";
   }
 
@@ -67,6 +71,8 @@ async function render(args: RenderProps<GridModel>): Promise<() => void> {
   model.on("change:columns", applyStyle);
   model.on("change:gap", applyStyle);
   model.on("change:template_areas", applyStyle);
+  model.on("change:template_rows", applyStyle);
+  model.on("change:height", applyStyle);
   model.on("change:children", () => {
     void build();
   });
