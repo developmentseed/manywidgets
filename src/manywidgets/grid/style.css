@@ -3,5 +3,11 @@
 }
 
 .manywidgets-grid__cell {
+  display: flex;
+  min-width: 0;
+}
+
+.manywidgets-grid__cell > * {
+  flex: 1 1 auto;
   min-width: 0;
 }
