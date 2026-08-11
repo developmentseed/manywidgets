@@ -41,6 +41,7 @@ project:
         - file: widgets/row.ipynb
         - file: widgets/column.ipynb
         - file: widgets/grid.ipynb
+        - file: widgets/grid_item.ipynb
         - file: widgets/fullscreen.ipynb
     - title: Lonboard
       children:
