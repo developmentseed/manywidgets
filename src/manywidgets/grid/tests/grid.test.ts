@@ -89,4 +89,15 @@ describe("Grid", () => {
       "repeat(4, minmax(0, 1fr))",
     );
   });
+
+  it("passes a string columns value straight through as track sizes", async () => {
+    const host = fakeHost();
+    const el = mountEl();
+    const model = fakeModel({ children: [], columns: "200px 1fr", gap: "8px" });
+    await widget.render({ model, el, host } as never);
+
+    expect(el.querySelector<HTMLElement>(".manywidgets-grid")!.style.gridTemplateColumns).toBe(
+      "200px 1fr",
+    );
+  });
 });

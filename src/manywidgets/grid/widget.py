@@ -27,7 +27,15 @@ class Grid(BaseWidget):
     children = traitlets.List(
         trait=traitlets.Instance(Widget), help="Child widgets, in row-major order."
     ).tag(sync=True, **widget_serialization)
-    columns = traitlets.Int(2, help="Number of equal-width columns.").tag(sync=True)
+    columns = traitlets.Union(
+        [traitlets.Int(), traitlets.Unicode()],
+        default_value=2,
+        help=(
+            "Either an int (N equal-width columns) or a raw CSS "
+            "grid-template-columns track string (e.g. \"200px 1fr\") for "
+            "asymmetric columns, e.g. a narrower sidebar beside a wider main."
+        ),
+    ).tag(sync=True)
     gap = traitlets.Unicode("8px", help="CSS gap between cells.").tag(sync=True)
     template_areas = traitlets.Unicode(
         "",

@@ -3,9 +3,14 @@ import { asNumber, renderChild, resolveModel, type RenderArgs } from "@manywidge
 
 interface GridModel {
   children: string[];
-  columns: number;
+  columns: number | string;
   gap: string;
   template_areas: string;
+}
+
+function columnsTracks(columns: number | string): string {
+  if (typeof columns === "string") return columns;
+  return `repeat(${Math.max(1, columns || 1)}, minmax(0, 1fr))`;
 }
 
 async function placementFor(
@@ -29,10 +34,9 @@ async function render(args: RenderProps<GridModel>): Promise<() => void> {
   let cleanups: Array<() => void> = [];
 
   function applyStyle(): void {
-    const columns = Math.max(1, Number(model.get("columns")) || 1);
     const areas = model.get("template_areas") || "";
     container.style.display = "grid";
-    container.style.gridTemplateColumns = `repeat(${columns}, minmax(0, 1fr))`;
+    container.style.gridTemplateColumns = columnsTracks(model.get("columns"));
     container.style.gridTemplateAreas = areas || "";
     container.style.gap = model.get("gap") || "8px";
   }
