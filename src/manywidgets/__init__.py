@@ -19,6 +19,7 @@ from .column import Column
 from .dropdown import Dropdown
 from .fullscreen import Fullscreen
 from .grid import Grid
+from .grid_item import GridItem
 from .legend import Legend
 from .number_display import NumberDisplay
 from .number_input import NumberInput
@@ -39,6 +40,7 @@ __all__ = [
     "Dropdown",
     "Fullscreen",
     "Grid",
+    "GridItem",
     "Legend",
     "NumberDisplay",
     "NumberInput",
