@@ -13,6 +13,7 @@ from manywidgets import (
     Chart,
     Column,
     Dropdown,
+    Fullscreen,
     Grid,
     Legend,
     NumberDisplay,
@@ -41,6 +42,7 @@ ALL_WIDGETS = [
     Row,
     Column,
     Grid,
+    Fullscreen,
 ]
 
 

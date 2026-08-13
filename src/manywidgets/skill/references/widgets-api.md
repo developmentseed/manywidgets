@@ -9,7 +9,7 @@ Display a widget by leaving it as the last expression in a notebook cell.
 
 - **Charts & displays:** `Chart`, `Stat`, `NumberDisplay`, `Text`, `Legend`
 - **Input controls:** `Slider`, `RangeSlider`, `Dropdown`, `Toggle`, `Button`, `NumberInput`
-- **Layout containers:** `Row`, `Column`, `Grid`
+- **Layout containers:** `Row`, `Column`, `Grid`, `Fullscreen`
 - **Linking:** `Binder`
 - **Lonboard interop:** `LayerToggle`, `LayerFilter`, `FilterBinder`, `MapFlyer`, `MapCompare`
 
@@ -248,6 +248,21 @@ Also: `Grid(child1, child2, ...)` — children passed positionally.
 | `children` | List | — | Child widgets, in row-major order. |
 | `columns` | Int | `2` | Number of equal-width columns. |
 | `gap` | Unicode | `'8px'` | CSS gap between cells. |
+| `widget_id` | Unicode | `''` | Stable unique id used for cross-widget linking (auto-assigned). |
+
+### `Fullscreen`
+
+Wrap a widget with an expand button that opens a viewport-covering overlay.
+
+```python
+Fullscreen(child, fullscreen, is_open=False)
+```
+
+| Trait | Type | Default | Description |
+|---|---|---|---|
+| `child` | Instance | — | Widget rendered inline (with the expand button). |
+| `fullscreen` | Instance | — | Optional alternate widget shown in the overlay instead of the child. |
+| `is_open` | Bool | `False` | Whether the fullscreen overlay is open (settable from Python). |
 | `widget_id` | Unicode | `''` | Stable unique id used for cross-widget linking (auto-assigned). |
 
 ## Linking

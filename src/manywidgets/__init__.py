@@ -17,6 +17,7 @@ from .button import Button
 from .chart import Chart
 from .column import Column
 from .dropdown import Dropdown
+from .fullscreen import Fullscreen
 from .grid import Grid
 from .legend import Legend
 from .number_display import NumberDisplay
@@ -36,6 +37,7 @@ __all__ = [
     "Chart",
     "Column",
     "Dropdown",
+    "Fullscreen",
     "Grid",
     "Legend",
     "NumberDisplay",
