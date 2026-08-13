@@ -28,3 +28,15 @@ def test_marker_and_sync():
 
 def test_auto_widget_id_prefix():
     assert Grid().widget_id.startswith("grid_")
+
+
+def test_template_rows_and_height_kwargs():
+    g = Grid(Stat(), template_rows="auto 1fr auto", height="500px")
+    assert g.template_rows == "auto 1fr auto"
+    assert g.height == "500px"
+
+
+def test_template_rows_and_height_default_empty():
+    g = Grid()
+    assert g.template_rows == ""
+    assert g.height == ""

@@ -3,6 +3,11 @@
 Children flow left-to-right, top-to-bottom into ``columns`` equal columns. Like
 :class:`~manywidgets.Row`/:class:`~manywidgets.Column`, children stay interactive
 and linked, live and in static export.
+
+Wrap a child in :class:`~manywidgets.GridItem` to control how many
+columns/rows its cell spans, or to place it into a named
+``template_areas`` region. Bare (unwrapped) children default to 1x1 cells,
+exactly as before.
 """
 
 from __future__ import annotations
@@ -22,8 +27,37 @@ class Grid(BaseWidget):
     children = traitlets.List(
         trait=traitlets.Instance(Widget), help="Child widgets, in row-major order."
     ).tag(sync=True, **widget_serialization)
-    columns = traitlets.Int(2, help="Number of equal-width columns.").tag(sync=True)
+    columns = traitlets.Union(
+        [traitlets.Int(), traitlets.Unicode()],
+        default_value=2,
+        help=(
+            "Either an int (N equal-width columns) or a raw CSS "
+            "grid-template-columns track string (e.g. \"200px 1fr\") for "
+            "asymmetric columns, e.g. a narrower sidebar beside a wider main."
+        ),
+    ).tag(sync=True)
     gap = traitlets.Unicode("8px", help="CSS gap between cells.").tag(sync=True)
+    template_areas = traitlets.Unicode(
+        "",
+        help=(
+            "Optional CSS grid-template-areas string (e.g. "
+            '\'"header header" "sidebar main"\'). When set, GridItem children '
+            "place by their area name instead of row-major flow."
+        ),
+    ).tag(sync=True)
+    template_rows = traitlets.Unicode(
+        "",
+        help=(
+            "Optional CSS grid-template-rows track string (e.g. "
+            '"auto 1fr auto") to size rows unequally, e.g. a thin header/footer '
+            "with a tall middle row. Rows default to auto-sizing (fit content) "
+            "when unset. \"fr\" tracks need Grid's own height set for there to "
+            "be extra space to distribute."
+        ),
+    ).tag(sync=True)
+    height = traitlets.Unicode(
+        "", help="Optional CSS height (e.g. \"600px\", \"100vh\")."
+    ).tag(sync=True)
 
     _myst_child_traits = traitlets.List(["children"]).tag(sync=True)
 

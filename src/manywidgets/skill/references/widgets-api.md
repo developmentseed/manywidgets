@@ -9,7 +9,7 @@ Display a widget by leaving it as the last expression in a notebook cell.
 
 - **Charts & displays:** `Chart`, `Stat`, `NumberDisplay`, `Text`, `Legend`
 - **Input controls:** `Slider`, `RangeSlider`, `Dropdown`, `Toggle`, `Button`, `NumberInput`
-- **Layout containers:** `Row`, `Column`, `Grid`, `Fullscreen`
+- **Layout containers:** `Row`, `Column`, `Grid`, `GridItem`, `Fullscreen`
 - **Linking:** `Binder`
 - **Lonboard interop:** `LayerToggle`, `LayerFilter`, `FilterBinder`, `MapFlyer`, `MapCompare`
 
@@ -238,7 +238,7 @@ Also: `Column(child1, child2, ...)` — children passed positionally.
 Arrange child widgets in an N-column grid.
 
 ```python
-Grid(children, columns=2, gap='8px')
+Grid(children, columns=2, gap='8px', template_areas='', template_rows='', height='')
 ```
 
 Also: `Grid(child1, child2, ...)` — children passed positionally.
@@ -246,8 +246,27 @@ Also: `Grid(child1, child2, ...)` — children passed positionally.
 | Trait | Type | Default | Description |
 |---|---|---|---|
 | `children` | List | — | Child widgets, in row-major order. |
-| `columns` | Int | `2` | Number of equal-width columns. |
+| `columns` | Union | `2` | Either an int (N equal-width columns) or a raw CSS grid-template-columns track string (e.g. "200px 1fr") for asymmetric columns, e.g. a narrower sidebar beside a wider main. |
 | `gap` | Unicode | `'8px'` | CSS gap between cells. |
+| `template_areas` | Unicode | `''` | Optional CSS grid-template-areas string (e.g. '"header header" "sidebar main"'). When set, GridItem children place by their area name instead of row-major flow. |
+| `template_rows` | Unicode | `''` | Optional CSS grid-template-rows track string (e.g. "auto 1fr auto") to size rows unequally, e.g. a thin header/footer with a tall middle row. Rows default to auto-sizing (fit content) when unset. "fr" tracks need Grid's own height set for there to be extra space to distribute. |
+| `height` | Unicode | `''` | Optional CSS height (e.g. "600px", "100vh"). |
+| `widget_id` | Unicode | `''` | Stable unique id used for cross-widget linking (auto-assigned). |
+
+### `GridItem`
+
+Wrap a widget with grid placement (span or named area).
+
+```python
+GridItem(child, col_span=1, row_span=1, area='')
+```
+
+| Trait | Type | Default | Description |
+|---|---|---|---|
+| `child` | Instance | — | The wrapped widget. |
+| `col_span` | Int | `1` | Number of grid columns this cell spans. |
+| `row_span` | Int | `1` | Number of grid rows this cell spans. |
+| `area` | Unicode | `''` | Named grid-template-area; requires the parent Grid's template_areas. |
 | `widget_id` | Unicode | `''` | Stable unique id used for cross-widget linking (auto-assigned). |
 
 ### `Fullscreen`

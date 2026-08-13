@@ -33,7 +33,7 @@ OUT = ROOT / "src" / "manywidgets" / "skill" / "references" / "widgets-api.md"
 GROUPS: list[tuple[str, list[str]]] = [
     ("Charts & displays", ["chart", "stat", "number_display", "text", "legend"]),
     ("Input controls", ["slider", "range_slider", "dropdown", "toggle", "button", "number_input"]),
-    ("Layout containers", ["row", "column", "grid", "fullscreen"]),
+    ("Layout containers", ["row", "column", "grid", "grid_item", "fullscreen"]),
     ("Linking", ["binder"]),
     ("Lonboard interop", ["layer_toggle", "layer_filter", "filter_binder", "map_flyer", "map_compare"]),
 ]
