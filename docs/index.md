@@ -60,3 +60,9 @@ manywidgets gives you two complementary linking tools, covered in the
 
 See the [demo notebook](examples/demo.ipynb) for a live, statically-exportable
 example wiring these together.
+
+## Forecast example
+
+[Europe's temperature outlook](examples/ensemble-forecast.ipynb) combines a live
+ECMWF forecast map with a calendar and local ensemble chart. It reads Zarr data
+in the browser and works without a running kernel.
