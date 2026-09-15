@@ -32,3 +32,6 @@ docs/widgets/*.ipynb
 
 # OS
 .DS_Store
+
+# Bundled forecast example (built before notebook execution)
+docs/examples/forecast/dist/

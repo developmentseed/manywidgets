@@ -7,7 +7,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "watch": "node scripts/build.mjs --watch",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc -p docs/examples/forecast/tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "tokens:gen": "node scripts/generate_radix_tokens.mjs",
@@ -15,7 +15,8 @@
     "docs:gen": "python scripts/build_widget_docs.py",
     "skill:gen": "python scripts/build_skill_reference.py",
     "serve": "python -m http.server -d docs/_build/html 3030",
-    "clean": "rm -rf src/manywidgets/*/dist"
+    "clean": "rm -rf src/manywidgets/*/dist",
+    "build:forecast": "node scripts/build_forecast_example.mjs"
   },
   "devDependencies": {
     "@anywidget/types": "^0.2.0",
