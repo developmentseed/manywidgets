@@ -1,6 +1,7 @@
 import { onChanges, safeSaveChanges, type AnyModel } from "@manywidgets/core";
-import { CITIES, DAY, openForecast, readPoint, type Place } from "./data";
+import { DAY, openForecast, readPoint, type Place } from "./data";
 import { createForecastMap, type ForecastMap } from "./map";
+import { DEFAULT_CONFIG, initialPlace, type ForecastConfig } from "./config";
 import type { ForecastView } from "./view";
 import type { Forecast, ForecastSelection, LocalForecast, Metric } from "./types";
 
@@ -32,14 +33,14 @@ function nextWeekIndex(forecast: Forecast, now: number) {
 }
 
 /** Coordinates model state, cancellable data reads and playback. */
-export function createForecastController(model: AnyModel, view: ForecastView) {
-  const memory = selectionMemory(`${location.pathname}/${model.get("widget_id") ?? "europe"}`);
+export function createForecastController(model: AnyModel, view: ForecastView, config: ForecastConfig = DEFAULT_CONFIG) {
+  const memory = selectionMemory(`${location.pathname}/${model.get("widget_id") ?? "europe"}/${JSON.stringify(config)}`);
   let restoredSelection = memory.read();
   let disposed = false;
   let status: LoadStatus = "idle";
   let forecast: Forecast | undefined;
   let point: LocalForecast | undefined;
-  let place: Place = CITIES[0];
+  let place: Place = initialPlace(config);
   let map: ForecastMap | undefined;
   let mapReady = false;
   let forecastRequest = new AbortController();
@@ -157,18 +158,20 @@ export function createForecastController(model: AnyModel, view: ForecastView) {
     forecast = undefined;
     point = undefined;
     try {
-      const latest = await openForecast(forecastRequest.signal);
+      const latest = await openForecast(forecastRequest.signal, Date.now(), config);
       if (disposed) return;
       forecast = latest;
       point = latest.point;
-      place = CITIES[0];
+      place = initialPlace(config);
       view.showPlace(place);
       map?.selectPlace(place);
       pointCache.clear();
       pointCache.set(pointKey(latest, place), point);
       view.showForecast(latest);
       const retainedDay = selection ? latest.days.findIndex(day => +day.date === selection.date) : -1;
-      set("day_index", retainedDay >= 0 ? retainedDay : nextWeekIndex(latest, +latest.checked));
+      const requestedDay = Number(model.get("day_index"));
+      const startingDay = requestedDay >= 0 ? Math.min(requestedDay, latest.days.length - 1) : nextWeekIndex(latest, +latest.checked);
+      set("day_index", retainedDay >= 0 ? retainedDay : startingDay);
       if (selection) set("metric", selection.metric);
       status = "ready";
       if (selection) void selectPlace(selection.place);
@@ -215,7 +218,7 @@ export function createForecastController(model: AnyModel, view: ForecastView) {
           selectPlace,
           progress: showMapProgress,
           error: showError,
-        });
+        }, config);
       } catch (error) {
         showError(error);
       }

@@ -1,40 +1,22 @@
 import * as zarr from "zarrita";
+import { DEFAULT_CONFIG, initialPlace, type ForecastConfig } from "./config";
 
-export const STORE_URL = "https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/dynamical/ecmwf-ifs-ens-forecast-15-day-0-25-degree/v0.1.0.zarr";
 export const DAY = 86400000;
-export const EUROPE: [number, number, number, number] = [-25, 34, 45, 72];
 export const GEO = {
   "spatial:dimensions": ["latitude", "longitude"],
   "spatial:transform": [0.25, 0, -180.125, 0, -0.25, 90.125],
   "spatial:shape": [721, 1440],
   "proj:code": "EPSG:4326",
 };
-export const TEMPERATURE_COLORS = ["#607faa", "#87babe", "#e8e9c1", "#eeb97e", "#be6454"];
-export const SPREAD_COLORS = ["#f2f0ea", "#d2d8de", "#98acc5", "#677da3", "#414768"];
-export const CITIES = [
-  { name: "Berlin", lon: 13.405, lat: 52.52 },
-  { name: "London", lon: -0.128, lat: 51.507 },
-  { name: "Paris", lon: 2.352, lat: 48.857 },
-  { name: "Madrid", lon: -3.704, lat: 40.417 },
-  { name: "Rome", lon: 12.496, lat: 41.903 },
-  { name: "Warsaw", lon: 21.012, lat: 52.23 },
-  { name: "Stockholm", lon: 18.069, lat: 59.329 },
-  { name: "Oslo", lon: 10.752, lat: 59.914 },
-  { name: "Helsinki", lon: 24.938, lat: 60.17 },
-  { name: "Athens", lon: 23.728, lat: 37.984 },
-  { name: "Skopje", lon: 21.432, lat: 41.998 },
-  { name: "Lisbon", lon: -9.139, lat: 38.723 },
-  { name: "Zurich", lon: 8.542, lat: 47.377 },
-];
 export type Place = { name: string; lon: number; lat: number };
 export type ForecastDay = { frame: number; date: Date; hour: number };
 export type PointForecast = { mean: number; low: number; high: number }[];
 
 /** Future daily snapshots at 12 UTC, up to fourteen days from opening. */
-export function forecastDays(initialized: Date, hours: number[], now = Date.now()): ForecastDay[] {
+export function forecastDays(initialized: Date, hours: number[], now = Date.now(), count = 14): ForecastDay[] {
   return hours.map((hour, frame) => ({ hour, frame, date: new Date(+initialized + hour * 3600000) }))
-    .filter(d => d.date.getUTCHours() === 12 && +d.date >= now && +d.date <= now + 14 * DAY)
-    .slice(0, 14);
+    .filter(d => d.date.getUTCHours() === 12 && +d.date >= now && +d.date <= now + count * DAY)
+    .slice(0, count);
 }
 
 export function candidateRuns(times: number[], now = Date.now()) {
@@ -61,8 +43,8 @@ export async function readPoint(array: zarr.Array<"float32", zarr.Readable>, run
   return { series: pointSummary(chunk), latitude: 90 - row / 4, longitude: col / 4 - 180 };
 }
 
-export async function openForecast(signal: AbortSignal, now = Date.now()) {
-  const store = await zarr.withConsolidatedMetadata(new zarr.FetchStore(STORE_URL, {
+export async function openForecast(signal: AbortSignal, now = Date.now(), config: ForecastConfig = DEFAULT_CONFIG) {
+  const store = await zarr.withConsolidatedMetadata(new zarr.FetchStore(config.store_url, {
     fetch: request => fetch(new Request(request, {
       cache: request.url.includes("temperature_2m/c/") ? "default" : "no-cache",
       signal: AbortSignal.any([signal, request.signal]),
@@ -80,9 +62,9 @@ export async function openForecast(signal: AbortSignal, now = Date.now()) {
   if (!candidates.length) throw new Error("The archive has no run from the last three days. Try again later.");
   for (const { run, time } of candidates) {
     const initialized = new Date(time);
-    const days = forecastDays(initialized, hours, now);
-    if (days.length < 7) continue;
-    const point = await readPoint(array, run, CITIES[0], signal);
+    const days = forecastDays(initialized, hours, now, config.forecast_days);
+    if (days.length < Math.min(7, config.forecast_days)) continue;
+    const point = await readPoint(array, run, initialPlace(config), signal);
     if (days.every(d => Number.isFinite(point.series[d.frame].mean))) {
       return { array, hours, run, initialized, days, point, checked: new Date(now) };
     }

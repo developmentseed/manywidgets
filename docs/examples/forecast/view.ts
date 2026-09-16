@@ -1,5 +1,6 @@
 import mapCss from "maplibre-gl/dist/maplibre-gl.css";
-import { CITIES, TEMPERATURE_COLORS, SPREAD_COLORS, type Place } from "./data";
+import type { Place } from "./data";
+import { DEFAULT_CONFIG, legendLabels, type ForecastConfig } from "./config";
 import { drawChart } from "./chart";
 import type { Forecast, LocalForecast, Metric } from "./types";
 
@@ -23,7 +24,7 @@ type Actions = {
 };
 
 /** Owns the forecast markup, element references and display updates. */
-export function createForecastView(element: HTMLElement) {
+export function createForecastView(element: HTMLElement, config: ForecastConfig = DEFAULT_CONFIG) {
   element.classList.add("forecast-widget");
   const css = document.createElement("style");
   css.textContent = mapCss;
@@ -88,7 +89,7 @@ export function createForecastView(element: HTMLElement) {
     <details class="fc-notes"><summary>How to read this forecast</summary><div>
       <p>The map and chart show air temperature at 12:00 UTC, about 2 metres above the ground. Select the same hour each day to compare the outlook through the week. These values are not daily highs.</p>
       <p>The mean averages 51 ensemble members. The shaded band in the chart spans their 10th to 90th percentiles. A wider band means the members disagree more. It does not guarantee that the temperature will stay inside that range.</p>
-      <p>Forecast spread on the map is the standard deviation across those members, in °C. A dark area marks greater disagreement. Missing values are transparent, and water is covered by the basemap.</p>
+      <p>Forecast spread on the map is the standard deviation across those members, in °C. Higher spread means greater disagreement. Missing values are transparent, and water is covered by the basemap.</p>
       <p class="fc-grid-note"></p>
       <p>Data: <a href="https://dynamical.org/catalog/ecmwf-ifs-ens-forecast-15-day-0-25-degree/" target="_blank" rel="noreferrer">ECMWF IFS ENS from dynamical.org</a>, CC BY 4.0. <a href="https://www.ecmwf.int/en/research/modelling-and-prediction/quantifying-forecast-uncertainty" target="_blank" rel="noreferrer">About ensemble forecasts</a>.</p>
     </div></details>`;
@@ -121,11 +122,14 @@ export function createForecastView(element: HTMLElement) {
     ramp: find(".fc-ramp"),
     ticks: find(".fc-ticks"),
   };
+  find("h2").textContent = config.region_name;
+  elements.reset.textContent = `View ${config.region_name}`;
+  elements.map.setAttribute("aria-label", `Forecast map of ${config.region_name}. Click to select a location.`);
   const metricButtons = Array.from(panel.querySelectorAll<HTMLButtonElement>("[data-metric]"));
   const events = new AbortController();
   let actions: Actions;
 
-  for (const [index, place] of CITIES.entries()) {
+  for (const [index, place] of config.locations.entries()) {
     elements.place.add(new Option(place.name, String(index)));
   }
 
@@ -143,7 +147,7 @@ export function createForecastView(element: HTMLElement) {
     elements.retry.addEventListener("click", actions.refresh, options);
     elements.refresh.addEventListener("click", actions.refresh, options);
     elements.place.addEventListener("change", () => {
-      const place = CITIES[Number(elements.place.value)];
+      const place = config.locations[Number(elements.place.value)];
       if (place) actions.selectPlace(place);
     }, options);
     elements.days.addEventListener("click", event => {
@@ -177,9 +181,9 @@ export function createForecastView(element: HTMLElement) {
       button.setAttribute("aria-pressed", String(button.dataset.metric === metric));
     }
     elements.keyTitle.textContent = spread ? "Ensemble spread · °C" : "Mean temperature · °C";
-    const colors = spread ? SPREAD_COLORS : TEMPERATURE_COLORS;
+    const colors = spread ? config.spread_colors : config.temperature_colors;
     elements.ramp.style.background = `linear-gradient(to right, ${colors.join(",")})`;
-    const labels = spread ? ["0", "2.5", "5", "7.5", "10+"] : ["−10", "0", "10", "20", "30", "40+"];
+    const labels = legendLabels(spread ? config.spread_range : config.temperature_range, spread ? 5 : 6);
     elements.ticks.replaceChildren(...labels.map(label => {
       const span = document.createElement("span");
       span.textContent = label;
@@ -204,7 +208,7 @@ export function createForecastView(element: HTMLElement) {
   }
 
   function showPlace(place: Place) {
-    const index = CITIES.findIndex(city => city.name === place.name);
+    const index = config.locations.findIndex(city => city.name === place.name);
     elements.place.querySelector('option[value="custom"]')?.remove();
     if (index < 0) elements.place.add(new Option(place.name, "custom"));
     elements.place.value = index < 0 ? "custom" : String(index);

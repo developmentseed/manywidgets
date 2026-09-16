@@ -3,10 +3,11 @@ import { MapboxOverlay } from "@deck.gl/mapbox";
 import { ZarrLayer, type GetTileDataOptions, type ZarrLayerProps } from "@developmentseed/deck.gl-zarr";
 import type { Texture } from "@luma.gl/core";
 import * as zarr from "zarrita";
-import { CITIES, EUROPE, GEO, summarize, type Place } from "./data";
+import { GEO, summarize, type Place } from "./data";
 import { createForecastColormap, encodeMissingValues, forecastPipeline, selectTileSlice, type ForecastTile } from "./raster";
 import { createBasemap, readBasemapTheme } from "./basemap";
 import { observeHostColorMode } from "@manywidgets/core";
+import { DEFAULT_CONFIG, initialPlace, type ForecastConfig } from "./config";
 import type { Forecast, Metric } from "./types";
 
 type MapEvents = {
@@ -16,35 +17,35 @@ type MapEvents = {
   error(error: unknown): void;
 };
 
-function placeAt(lon: number, lat: number): Place | undefined {
-  if (lon < EUROPE[0] || lon > EUROPE[2] || lat < EUROPE[1] || lat > EUROPE[3]) return;
-  const nearby = CITIES.find(place => {
+function placeAt(lon: number, lat: number, config: ForecastConfig): Place | undefined {
+  if (lon < config.bounds[0] || lon > config.bounds[2] || lat < config.bounds[1] || lat > config.bounds[3]) return;
+  const nearby = config.locations.find(place => {
     const distance = Math.hypot((place.lon - lon) * Math.cos(lat * Math.PI / 180), place.lat - lat);
     return distance < 0.35;
   });
   return nearby ?? {
     lon,
     lat,
-    name: `${lat.toFixed(1)}°N, ${Math.abs(lon).toFixed(1)}°${lon < 0 ? "W" : "E"}`,
+    name: `${Math.abs(lat).toFixed(1)}°${lat < 0 ? "S" : "N"}, ${Math.abs(lon).toFixed(1)}°${lon < 0 ? "W" : "E"}`,
   };
 }
 
-/** Skips source chunks outside Europe because raster traversal ignores extent. */
-function intersectsEurope(options: GetTileDataOptions) {
+/** Skips source chunks outside the configured region because raster traversal ignores extent. */
+function intersectsRegion(options: GetTileDataOptions, config: ForecastConfig) {
   const west = -180.125 + options.x * 8;
   const north = 90.125 - options.y * 8;
-  return west + 8 >= EUROPE[0] && west <= EUROPE[2] && north >= EUROPE[1] && north - 8 <= EUROPE[3];
+  return west + 8 >= config.bounds[0] && west <= config.bounds[2] && north >= config.bounds[1] && north - 8 <= config.bounds[3];
 }
 
 /** Owns the basemap, raster requests, marker and GPU resources. */
-export function createForecastMap(container: HTMLDivElement, events: MapEvents) {
+export function createForecastMap(container: HTMLDivElement, events: MapEvents, config: ForecastConfig = DEFAULT_CONFIG) {
   let disposed = false;
   let generation = 0;
   let pendingRequests = 0;
   let viewportReady = false;
   const textures = new Set<Texture>();
   let colormap: Texture | undefined;
-  const bounds: maplibregl.LngLatBoundsLike = [[EUROPE[0], EUROPE[1]], [EUROPE[2], EUROPE[3]]];
+  const bounds: maplibregl.LngLatBoundsLike = [[config.bounds[0], config.bounds[1]], [config.bounds[2], config.bounds[3]]];
   let theme = readBasemapTheme(container);
   const map = new maplibregl.Map({
     container,
@@ -67,11 +68,11 @@ export function createForecastMap(container: HTMLDivElement, events: MapEvents) 
   const dot = document.createElement("div");
   dot.className = "fc-marker";
   const marker = new maplibregl.Marker({ element: dot })
-    .setLngLat([CITIES[0].lon, CITIES[0].lat])
+    .setLngLat([initialPlace(config).lon, initialPlace(config).lat])
     .addTo(map);
 
   map.on("click", event => {
-    const place = placeAt(event.lngLat.lng, event.lngLat.lat);
+    const place = placeAt(event.lngLat.lng, event.lngLat.lat, config);
     if (place) events.selectPlace(place);
   });
   function updateTheme() {
@@ -130,14 +131,14 @@ export function createForecastMap(container: HTMLDivElement, events: MapEvents) 
       node: forecast.array,
       metadata: GEO,
       selection: { init_time: forecast.run, lead_time: null, ensemble_member: null },
-      extent: EUROPE,
+      extent: config.bounds,
       maxRequests: 3,
       maxCacheSize: 80,
       debounceTime: 180,
       opacity: 0.92,
       beforeId: "water",
       getTileData: async (array, options: GetTileDataOptions) => {
-        if (!intersectsEurope(options)) return null;
+        if (!intersectsRegion(options, config)) return null;
         if (isCurrent()) {
           pendingRequests++;
           viewportReady = false;
@@ -149,7 +150,7 @@ export function createForecastMap(container: HTMLDivElement, events: MapEvents) 
           const values = encodeMissingValues(summarize(chunk));
           const pixels = options.width * options.height;
           const uploadedSlice = frame + (spread ? forecast.hours.length : 0);
-          colormap ??= createForecastColormap(options.device);
+          colormap ??= createForecastColormap(options.device, config);
           const texture = options.device.createTexture({
             dimension: "2d",
             format: "r32float",
@@ -183,7 +184,7 @@ export function createForecastMap(container: HTMLDivElement, events: MapEvents) 
       renderTile: tile => {
         if (!tile || !colormap) return { renderPipeline: [] };
         selectTileSlice(tile, frame + (spread ? forecast.hours.length : 0));
-        return { renderPipeline: forecastPipeline(tile, colormap, metric) };
+        return { renderPipeline: forecastPipeline(tile, colormap, metric, config) };
       },
       updateTriggers: { renderTile: [frame, spread] },
       onTileUnload: tile => {

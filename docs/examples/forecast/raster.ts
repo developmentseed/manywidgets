@@ -6,7 +6,7 @@ import {
   LinearRescale,
   createColormapTexture,
 } from "@developmentseed/deck.gl-raster/gpu-modules";
-import { SPREAD_COLORS, TEMPERATURE_COLORS } from "./data";
+import { DEFAULT_CONFIG, type ForecastConfig } from "./config";
 import type { Metric } from "./types";
 
 export const NO_DATA = -9999;
@@ -21,9 +21,9 @@ export type ForecastTile = {
 };
 
 /** Samples the legend's color stops into two 256-pixel RGBA colormap rows. */
-export function colormapPixels() {
+export function colormapPixels(config: ForecastConfig = DEFAULT_CONFIG) {
   const pixels = new Uint8ClampedArray(256 * 2 * 4);
-  for (const [row, colors] of [TEMPERATURE_COLORS, SPREAD_COLORS].entries()) {
+  for (const [row, colors] of [config.temperature_colors, config.spread_colors].entries()) {
     const stops = colors.map(hex => [1, 3, 5].map(offset => parseInt(hex.slice(offset, offset + 2), 16)));
     for (let x = 0; x < 256; x++) {
       const position = x / 255 * (stops.length - 1);
@@ -39,8 +39,8 @@ export function colormapPixels() {
   return pixels;
 }
 
-export function createForecastColormap(device: Device) {
-  return createColormapTexture(device, new ImageData(colormapPixels(), 256, 2));
+export function createForecastColormap(device: Device, config: ForecastConfig = DEFAULT_CONFIG) {
+  return createColormapTexture(device, new ImageData(colormapPixels(config), 256, 2));
 }
 
 /** Converts missing summaries to the finite sentinel accepted by FilterNoDataVal. */
@@ -60,12 +60,13 @@ export function selectTileSlice(tile: ForecastTile, slice: number) {
 }
 
 /** Composes the library's texture, missing-value, rescale and colormap modules. */
-export function forecastPipeline(tile: ForecastTile, colormap: Texture, metric: Metric) {
+export function forecastPipeline(tile: ForecastTile, colormap: Texture, metric: Metric, config: ForecastConfig = DEFAULT_CONFIG) {
   const spread = metric === "spread";
+  const [rescaleMin, rescaleMax] = spread ? config.spread_range : config.temperature_range;
   return [
     { module: CreateTexture, props: { textureName: tile.texture } },
     { module: FilterNoDataVal, props: { value: NO_DATA } },
-    { module: LinearRescale, props: { rescaleMin: spread ? 0 : -10, rescaleMax: spread ? 10 : 40 } },
+    { module: LinearRescale, props: { rescaleMin, rescaleMax } },
     { module: Colormap, props: { colormapTexture: colormap, colormapIndex: spread ? 1 : 0 } },
   ];
 }
