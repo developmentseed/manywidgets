@@ -1,8 +1,17 @@
-import { describe, expect, it } from "vitest";
-import { candidateRuns, DAY, forecastDays, pointSummary, summarize } from "./data";
+/** @vitest-environment node */
+import { DEFAULT_CONFIG } from "./config";
+import { describe, expect, it, vi } from "vitest";
+import { candidateRuns, DAY, forecastDays, pointSummary, summarize, openForecast } from "./data";
 const hours = [...Array.from({length:49},(_,i)=>i*3), ...Array.from({length:36},(_,i)=>150+i*6)];
 
 describe("live forecast dates", () => {
+  it("limits a shorter outlook without changing source frame indices", () => {
+    const days = forecastDays(new Date("2026-09-14T00:00:00Z"), hours, Date.parse("2026-09-15T13:00:00Z"), 7);
+    expect(days).toHaveLength(7);
+    expect(days[0].date.toISOString()).toBe("2026-09-16T12:00:00.000Z");
+    expect(days.at(-1)!.date.toISOString()).toBe("2026-09-22T12:00:00.000Z");
+    expect(days.every(day => hours[day.frame] === day.hour)).toBe(true);
+  });
   it("selects recent past runs newest first, excluding future and stale runs", () => {
     const now = Date.parse("2026-09-15T10:00:00Z");
     expect(candidateRuns([now-4*DAY,now-2*DAY,now-DAY,now+DAY,now-12*3600000].map(t=>t/1000),now).map(d=>d.run)).toEqual([4,2,1]);
@@ -40,5 +49,24 @@ describe("ensemble calculations", () => {
     const points=pointSummary({data,shape:[2,51],stride:[51,1]});
     expect(points[0]).toEqual({mean:25,low:5,high:45});
     expect(points[1]).toEqual({mean:NaN,low:NaN,high:NaN});
+  });
+});
+
+
+describe("configured forecast store", () => {
+  it("requests metadata from the supplied store instead of the default", async () => {
+    const fetchStore = vi.fn(async (_request: Request) => new Response(null, { status: 404 }));
+    vi.stubGlobal("fetch", fetchStore);
+    try {
+      await expect(openForecast(new AbortController().signal, Date.now(), {
+        ...DEFAULT_CONFIG, store_url: "https://weather.example/ecmwf.zarr",
+      })).rejects.toThrow();
+      expect(fetchStore).toHaveBeenCalled();
+      for (const [request] of fetchStore.mock.calls) {
+        expect(request.url).toMatch(/^https:\/\/weather\.example\/ecmwf\.zarr\//);
+      }
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

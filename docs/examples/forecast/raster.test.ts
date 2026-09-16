@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import type { Texture } from "@luma.gl/core";
-import { SPREAD_COLORS, TEMPERATURE_COLORS } from "./data";
-import { colormapPixels, encodeMissingValues, NO_DATA, selectTileSlice } from "./raster";
+import { DEFAULT_CONFIG, legendLabels } from "./config";
+const { temperature_colors: TEMPERATURE_COLORS, spread_colors: SPREAD_COLORS } = DEFAULT_CONFIG;
+import { colormapPixels, encodeMissingValues, NO_DATA, selectTileSlice, forecastPipeline } from "./raster";
 
 const rgb = (hex: string) => [1, 3, 5].map(offset => parseInt(hex.slice(offset, offset + 2), 16));
 
@@ -44,4 +45,14 @@ describe("forecast raster data", () => {
     expect(Array.from(writeData.mock.calls[1][0])).toEqual([30, 40]);
     expect(tile.values).toHaveLength(8);
   });
+});
+
+ it("uses configured scale endpoints in the GPU pipeline and legend", () => {
+  const config = { ...DEFAULT_CONFIG, temperature_range: [-5, 25] as [number, number], spread_range: [1, 5] as [number, number], temperature_colors: ["#000000", "#ffffff"] };
+  const tile = { texture: {} } as Parameters<typeof forecastPipeline>[0];
+  const texture = {} as Texture;
+  expect(forecastPipeline(tile, texture, "mean", config)[2].props).toEqual({ rescaleMin: -5, rescaleMax: 25 });
+  expect(forecastPipeline(tile, texture, "spread", config)[2].props).toEqual({ rescaleMin: 1, rescaleMax: 5 });
+  expect(legendLabels(config.temperature_range, 6)).toEqual(["−5", "1", "7", "13", "19", "25+"]);
+  expect(Array.from(colormapPixels(config).slice(128 * 4, 129 * 4))).toEqual([128, 128, 128, 255]);
 });

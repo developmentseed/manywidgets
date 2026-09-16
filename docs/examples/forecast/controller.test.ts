@@ -1,9 +1,10 @@
+import { DEFAULT_CONFIG } from "./config";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AnyModel } from "@manywidgets/core";
 import { fakeModel } from "../../../tests/js/index";
 import { createForecastController } from "./controller";
 import { createForecastMap } from "./map";
-import { CITIES, DAY, openForecast, readPoint } from "./data";
+import { DAY, openForecast, readPoint } from "./data";
 import type { Forecast, LocalForecast } from "./types";
 import type { ForecastView } from "./view";
 
@@ -14,6 +15,7 @@ vi.mock("./data", async importOriginal => ({
   readPoint: vi.fn(),
 }));
 
+const CITIES = DEFAULT_CONFIG.locations;
 const now = Date.parse("2026-09-15T10:00:00Z");
 const point = { latitude: 52.5, longitude: 13.5, series: [{ mean: 18, low: 15, high: 22 }] };
 const forecast = {
@@ -34,8 +36,8 @@ function deferred<T>() {
   return { promise, resolve };
 }
 
-function setup(widgetId: string = crypto.randomUUID()) {
-  const model = fakeModel({ widget_id: widgetId, day_index: 7, metric: "mean", playing: false });
+function setup(widgetId: string = crypto.randomUUID(), config = DEFAULT_CONFIG, dayIndex = 7) {
+  const model = fakeModel({ widget_id: widgetId, day_index: dayIndex, metric: "mean", playing: false });
   const view = {
     mapContainer: document.createElement("div"),
     bind: vi.fn(), showForecast: vi.fn(), showMetric: vi.fn(), showDate: vi.fn(),
@@ -45,7 +47,7 @@ function setup(widgetId: string = crypto.randomUUID()) {
   } satisfies ForecastView;
   const map = { show: vi.fn(), clear: vi.fn(), selectPlace: vi.fn(), reset: vi.fn(), resize: vi.fn(), dispose: vi.fn() };
   vi.mocked(createForecastMap).mockReturnValue(map);
-  const controller = createForecastController(model as AnyModel, view);
+  const controller = createForecastController(model as AnyModel, view, config);
   cleanups.push(controller.dispose);
   controller.start();
   const events = vi.mocked(createForecastMap).mock.calls.at(-1)![1];
@@ -67,6 +69,35 @@ afterEach(() => {
 });
 
 describe("forecast controller lifecycle", () => {
+  it("passes regional settings to the reader and map and honors the starting day", async () => {
+    const config = { ...DEFAULT_CONFIG, region_name: "Switzerland", bounds: [5.9, 45.8, 10.6, 47.9] as [number, number, number, number], locations: [CITIES.at(-1)!], initial_location: "Zurich", forecast_days: 7 };
+    const { events, model, view } = setup(undefined, config, 2);
+    await events.ready();
+    expect(openForecast).toHaveBeenCalledWith(expect.any(AbortSignal), now, config);
+    expect(vi.mocked(createForecastMap).mock.calls.at(-1)?.[2]).toEqual(config);
+    expect(model.get("day_index")).toBe(2);
+    expect(view.showPlace).toHaveBeenLastCalledWith(config.locations[0]);
+  });
+
+  it("opens about a week ahead for the automatic starting day", async () => {
+    const { events, model } = setup(undefined, DEFAULT_CONFIG, -1);
+    await events.ready();
+    expect(model.get("day_index")).toBe(7);
+  });
+
+  it("does not restore another configuration's location or date", async () => {
+    const first = setup("config-remount");
+    await first.events.ready();
+    first.actions.selectDay(9);
+    first.controller.dispose();
+    cleanups = [];
+    const config = { ...DEFAULT_CONFIG, initial_location: "Zurich" };
+    const second = setup("config-remount", config, 1);
+    await second.events.ready();
+    expect(second.model.get("day_index")).toBe(1);
+    expect(second.view.showPlace).toHaveBeenLastCalledWith(CITIES.at(-1));
+  });
+
   it("ignores a late location response after a newer place is selected", async () => {
     const { events, actions, view } = setup();
     await events.ready();
