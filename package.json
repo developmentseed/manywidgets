@@ -7,7 +7,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "watch": "node scripts/build.mjs --watch",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc -p docs/examples/forecast/tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "tokens:gen": "node scripts/generate_radix_tokens.mjs",
@@ -15,18 +15,35 @@
     "docs:gen": "python scripts/build_widget_docs.py",
     "skill:gen": "python scripts/build_skill_reference.py",
     "serve": "python -m http.server -d docs/_build/html 3030",
-    "clean": "rm -rf src/manywidgets/*/dist"
+    "clean": "rm -rf src/manywidgets/*/dist",
+    "build:forecast": "node scripts/build_forecast_example.mjs"
   },
   "devDependencies": {
     "@anywidget/types": "^0.2.0",
+    "@deck.gl/core": "9.3.6",
+    "@deck.gl/geo-layers": "9.3.6",
+    "@deck.gl/layers": "9.3.6",
+    "@deck.gl/mapbox": "9.3.6",
+    "@developmentseed/deck.gl-raster": "0.7.0",
+    "@developmentseed/deck.gl-zarr": "0.7.0",
+    "@luma.gl/core": "9.3.6",
     "esbuild": "^0.25.0",
     "jsdom": "^25.0.0",
+    "maplibre-gl": "5.24.0",
     "mystmd": "^1.8.3",
     "typescript": "^5.4.0",
-    "vitest": "^2.1.0"
+    "vitest": "^2.1.0",
+    "zarrita": "0.7.3"
   },
   "dependencies": {
     "chart.js": "^4.4.0",
     "marked": "^14.0.0"
+  },
+  "overrides": {
+    "@luma.gl/gltf": "9.3.6",
+    "@luma.gl/core": "$@luma.gl/core",
+    "@luma.gl/webgl": "9.3.6",
+    "@luma.gl/engine": "9.3.6",
+    "@luma.gl/shadertools": "9.3.6"
   }
 }

@@ -1,0 +1,695 @@
+.forecast-widget {
+  width: 100%;
+  min-width: 0;
+  container: forecast / inline-size;
+  font-family: var(--mw-font-family, system-ui, sans-serif);
+  color: var(--mw-color-text, #26332f);
+  --fc-ink: var(--mw-color-text);
+  --fc-line: var(--mw-color-border);
+  --fc-muted: var(--mw-color-text-muted);
+  --fc-accent: var(--mw-accent-11, color-mix(in srgb, var(--mw-color-accent) 75%, var(--mw-color-text)));
+  --fc-band: var(--mw-accent-a4, color-mix(in srgb, var(--mw-color-accent) 22%, transparent));
+  --fc-color-mode: light;
+  color-scheme: var(--mw-color-mode, var(--fc-color-mode));
+}
+
+.forecast-widget[data-mw-color-mode="dark"] {
+  --fc-color-mode: dark;
+}
+
+.forecast-widget * {
+  box-sizing: border-box;
+}
+
+.fc-shell {
+  background: var(--mw-color-surface, #fff);
+  border: 1px solid var(--fc-line);
+  border-radius: var(--mw-radius-3);
+  overflow: hidden;
+}
+
+.forecast-widget button,
+.forecast-widget select {
+  font: inherit;
+}
+
+.forecast-widget button {
+  cursor: pointer;
+}
+
+.forecast-widget button:disabled {
+  cursor: wait;
+  opacity: .5;
+}
+
+.forecast-widget button:focus-visible,
+.forecast-widget select:focus-visible,
+.forecast-widget summary:focus-visible {
+  outline: 2px solid var(--mw-color-focus);
+  outline-offset: 3px;
+}
+
+.fc-heading {
+  padding: 25px 28px 19px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.fc-heading h2 {
+  font-size: 29px;
+  line-height: 1;
+  letter-spacing: -.035em;
+  font-weight: 560;
+  margin: 0 0 9px;
+}
+
+.fc-heading p {
+  font-size: 12px;
+  margin: 0;
+  color: var(--fc-muted);
+}
+
+.fc-source {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  padding-right: 12px;
+  font-size: 11px;
+  color: var(--fc-muted);
+}
+
+.fc-source > span {
+  color: var(--fc-ink);
+}
+
+.fc-refresh {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: 11px;
+}
+
+.fc-refresh:hover {
+  color: var(--fc-ink);
+  text-decoration: underline;
+}
+
+.fc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--fc-line);
+}
+
+.fc-tabs {
+  display: flex;
+  gap: var(--mw-space-5, 24px);
+}
+
+.fc-tabs button {
+  color: var(--fc-muted);
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 13px 0 11px;
+  font-size: 13px;
+}
+
+.fc-tabs button[aria-pressed="true"] {
+  color: var(--fc-ink);
+  border-bottom-color: var(--fc-ink);
+  font-weight: var(--mw-font-weight-strong);
+}
+
+.fc-tabs button:hover {
+  color: var(--fc-ink);
+}
+
+.fc-reset {
+  font-size: 11px !important;
+  border: 0;
+  background: none;
+  color: var(--fc-muted);
+  padding: 10px 0;
+}
+
+.fc-reset:hover {
+  color: var(--fc-ink);
+}
+
+.fc-map-wrap {
+  position: relative;
+}
+
+.forecast-map {
+  height: clamp(420px, 57vh, 610px);
+  width: 100%;
+  background: var(--mw-color-surface-elevated);
+}
+
+.fc-map-key {
+  position: absolute;
+  left: 20px;
+  bottom: 18px;
+  width: 228px;
+  padding: 11px 13px 10px;
+  border-radius: var(--mw-radius-1, 3px);
+  background: color-mix(in srgb, var(--mw-color-surface) 94%, transparent);
+  pointer-events: none;
+}
+
+.fc-key-title {
+  font-size: 10px;
+  color: var(--mw-color-text);
+  margin-bottom: 7px;
+}
+
+.fc-ramp {
+  height: 7px;
+  border-radius: 1px;
+}
+
+.fc-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-size: 9px;
+  color: var(--mw-color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.fc-marker {
+  height: 13px;
+  width: 13px;
+  border: 3px solid var(--mw-color-surface);
+  background: var(--fc-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--mw-color-border-strong);
+}
+
+.fc-map-caption {
+  display: flex;
+  align-items: center;
+  gap: var(--mw-space-3, 12px);
+  justify-content: space-between;
+  padding: 10px 28px;
+  min-height: 35px;
+  font-size: 10px;
+  color: var(--fc-muted);
+  border-bottom: 1px solid var(--fc-line);
+}
+
+.fc-time-note {
+  white-space: nowrap;
+}
+
+.fc-retry {
+  border: 0;
+  background: none;
+  color: var(--mw-color-negative);
+  padding: 0;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+.fc-timeline {
+  padding: 20px 28px 0;
+}
+
+.fc-timeline-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--mw-space-3, 12px);
+  margin-bottom: 14px;
+}
+
+.fc-selected-date {
+  font-size: 15px;
+  font-weight: 550;
+  letter-spacing: -.015em;
+}
+
+.fc-time-actions {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.fc-next-week {
+  border: 0;
+  background: none;
+  padding: 5px 0;
+  font-size: 11px !important;
+  color: var(--fc-muted);
+}
+
+.fc-next-week:hover {
+  color: var(--fc-ink);
+}
+
+.fc-play {
+  width: 29px;
+  height: 29px;
+  border-radius: 50%;
+  border: 1px solid var(--mw-color-border);
+  background: var(--mw-color-surface);
+  color: var(--fc-ink);
+  padding: 4px;
+  display: grid;
+  place-items: center;
+}
+
+.fc-play svg {
+  width: 18px;
+  height: 18px;
+}
+
+.fc-play:hover {
+  background: var(--mw-color-surface-elevated);
+}
+
+.fc-days {
+  min-height: 74px;
+  position: relative;
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  border-bottom: 1px solid var(--fc-line);
+}
+
+.fc-day {
+  flex: 1 0 41px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 4px 12px;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--fc-muted);
+}
+
+.fc-day span {
+  font-size: 10px;
+}
+
+.fc-day strong {
+  font-size: 15px;
+  font-weight: 450;
+  font-variant-numeric: tabular-nums;
+}
+
+.fc-day:hover {
+  background: var(--mw-color-surface-elevated);
+}
+
+.fc-day[aria-pressed="true"] {
+  background: var(--mw-color-accent-soft);
+  border-bottom-color: var(--fc-accent);
+  color: var(--fc-accent);
+}
+
+.fc-day[aria-pressed="true"] strong {
+  font-weight: var(--mw-font-weight-strong);
+}
+
+.fc-local {
+  display: grid;
+  grid-template-columns: 165px minmax(0,1fr);
+  gap: 22px;
+  padding: 25px 28px 20px;
+  align-items: center;
+}
+
+.fc-place-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 10px;
+  color: var(--fc-muted);
+}
+
+.fc-place {
+  max-width: 100%;
+  color: var(--fc-ink);
+  font-size: var(--mw-font-size-4, 18px) !important;
+  border: 0;
+  border-bottom: 1px solid var(--mw-color-border-strong);
+  border-radius: 0;
+  padding: 2px 16px 4px 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.fc-point-value {
+  min-height: 50.4px;
+  white-space: nowrap;
+  font-size: 42px;
+  font-weight: 450;
+  letter-spacing: -.05em;
+  line-height: 1.2;
+  margin-top: 13px;
+}
+
+.fc-point-value span {
+  font-size: var(--mw-font-size-5, 20px);
+  letter-spacing: -.02em;
+  margin-left: 2px;
+  vertical-align: top;
+  line-height: 2;
+}
+
+.fc-point-range {
+  min-height: 3em;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--fc-ink);
+  margin: 4px 0;
+}
+
+.fc-point-date {
+  min-height: 1.5em;
+  line-height: 1.5;
+  font-size: 10px;
+  color: var(--fc-muted);
+  margin: 5px 0 0;
+}
+
+.fc-chart-area {
+  min-width: 0;
+}
+
+.fc-chart {
+  width: 100%;
+  height: 190px;
+  font-size: 12px;
+  color: var(--fc-muted);
+}
+
+.fc-chart svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.fc-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--mw-space-4, 16px);
+  margin-bottom: 8px;
+  font-size: 10px;
+  color: var(--fc-muted);
+}
+
+.fc-chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fc-mean-key::before {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 2px;
+  background: var(--fc-accent);
+}
+
+.fc-range-key::before {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 8px;
+  background: var(--fc-band);
+}
+
+.fc-chart-grid {
+  stroke: var(--mw-color-border);
+  stroke-width: 1;
+}
+
+.fc-chart-label {
+  fill: var(--mw-color-text-muted);
+  font-size: 11px;
+}
+
+.fc-chart-band {
+  fill: var(--fc-band);
+  fill-opacity: .85;
+}
+
+.fc-chart-line {
+  fill: none;
+  stroke: var(--fc-accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.fc-chart-cursor {
+  stroke: var(--mw-color-border-strong);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.fc-chart-point {
+  fill: var(--fc-accent);
+  stroke: var(--mw-color-surface);
+  stroke-width: 2;
+}
+
+.fc-chart-target {
+  cursor: pointer;
+}
+
+.fc-chart svg,
+.fc-chart-target {
+  outline: none;
+}
+
+.fc-chart-target:focus-visible {
+  fill: var(--mw-color-focus);
+  fill-opacity: .12;
+}
+
+.fc-notes {
+  margin: 0 28px;
+  border-top: 1px solid var(--fc-line);
+}
+
+.fc-notes summary {
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--fc-muted);
+  padding: 15px 0;
+}
+
+.fc-notes > div {
+  padding: 0 0 12px;
+  max-width: 660px;
+}
+
+.fc-notes p {
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 0 0 10px;
+  color: var(--fc-muted);
+}
+
+.fc-notes a {
+  color: var(--fc-accent);
+  text-underline-offset: 2px;
+}
+
+.forecast-widget .maplibregl-ctrl-group {
+  border-radius: var(--mw-radius-1, 3px);
+  border: 1px solid var(--mw-color-border);
+  box-shadow: none;
+}
+
+.forecast-widget .maplibregl-ctrl-attrib {
+  font-size: 9px;
+  background: color-mix(in srgb, var(--mw-color-surface) 94%, transparent);
+}
+
+
+.forecast-widget .maplibregl-ctrl-group,
+.forecast-widget .maplibregl-ctrl-attrib,
+.forecast-widget .maplibregl-ctrl-attrib a {
+  background-color: var(--mw-color-surface);
+  color: var(--mw-color-text-muted);
+}
+
+.forecast-widget .maplibregl-ctrl-group button {
+  color: var(--mw-color-text);
+  border-color: var(--mw-color-border);
+}
+
+.forecast-widget .maplibregl-ctrl-group button:hover {
+  background-color: var(--mw-color-surface-elevated);
+}
+
+.forecast-widget .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon,
+.forecast-widget .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+  background-image: none;
+  display: grid;
+  place-items: center;
+}
+
+.forecast-widget .maplibregl-ctrl-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.forecast-widget .maplibregl-ctrl-attrib-button {
+  background: var(--mw-color-surface);
+  color: var(--mw-color-text);
+}
+
+.forecast-widget .maplibregl-ctrl-attrib-button::after {
+  content: "i";
+  display: block;
+  width: 13px;
+  height: 13px;
+  margin: auto;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font: bold 10px/13px serif;
+  text-align: center;
+}
+
+@container forecast (max-width: 650px) {
+  .fc-heading {
+    padding: 21px 18px 13px;
+    gap: var(--mw-space-3, 12px);
+  }
+
+  .fc-heading p {
+    min-height: 2lh;
+  }
+
+  .fc-heading h2 {
+    font-size: 25px;
+  }
+
+  .fc-source {
+    font-size: 10px;
+    padding-right: 15px;
+  }
+
+  .fc-refresh {
+    min-height: 2lh;
+    max-width: 135px;
+    text-align: right;
+    line-height: 1.5;
+  }
+
+  .fc-toolbar {
+    padding: 0 18px;
+  }
+
+  .fc-tabs {
+    gap: 20px;
+  }
+
+  .fc-tabs button {
+    font-size: 12px;
+  }
+
+  .fc-map-caption {
+    padding: 9px 18px;
+    gap: 6px;
+    font-size: 9px;
+  }
+
+  .fc-timeline {
+    padding: 17px 18px 0;
+  }
+
+  .fc-selected-date {
+    font-size: 13px;
+  }
+
+  .fc-next-week {
+    display: none;
+  }
+
+  .fc-days {
+    scroll-snap-type: x proximity;
+  }
+
+  .fc-day {
+    flex-basis: 43px;
+    scroll-snap-align: center;
+  }
+
+  .fc-local {
+    grid-template-columns: 1fr;
+    padding: 20px 18px;
+    gap: 22px;
+  }
+
+  .fc-place-summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 15px;
+  }
+
+  .fc-place-label {
+    grid-row: span 2;
+    align-self: center;
+  }
+
+  .fc-point-value {
+    text-align: right;
+    margin: 0;
+    font-size: 36px;
+  }
+
+  .fc-point-range {
+    text-align: right;
+    margin: 0;
+  }
+
+  .fc-point-date {
+    grid-column: 1 / -1;
+    margin-top: 10px;
+  }
+
+  .fc-chart-legend {
+    justify-content: flex-start;
+  }
+
+  .fc-notes {
+    margin: 0 18px;
+  }
+
+  .fc-map-key {
+    bottom: 27px;
+    left: 12px;
+    width: 194px;
+  }
+
+  .forecast-map {
+    height: 390px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .forecast-widget * {
+    scroll-behavior: auto !important;
+  }
+}
