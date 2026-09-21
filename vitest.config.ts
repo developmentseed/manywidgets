@@ -16,6 +16,7 @@ export default defineConfig({
     include: [
       "src/manywidgets/**/tests/*.test.ts",
       "packages/core/**/*.test.ts",
+      "docs/examples/forecast/*.test.ts",
     ],
   },
 });

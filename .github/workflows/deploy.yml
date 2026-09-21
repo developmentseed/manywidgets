@@ -31,6 +31,8 @@ jobs:
       - run: npm ci
       - run: npm run build # widget dist/widget.js (embedded into widget state on execute)
 
+      - run: npm run build:forecast
+
       # Install the package + a kernel so the example notebooks can be executed.
       # numpy is needed by the Chart examples (it's an optional extra); nbformat
       # for the doc generator.

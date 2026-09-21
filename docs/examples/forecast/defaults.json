@@ -1,0 +1,101 @@
+{
+  "store_url": "https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/dynamical/ecmwf-ifs-ens-forecast-15-day-0-25-degree/v0.1.0.zarr",
+  "region_name": "Europe",
+  "bounds": [
+    -25,
+    34,
+    45,
+    72
+  ],
+  "locations": [
+    {
+      "name": "Berlin",
+      "lon": 13.405,
+      "lat": 52.52
+    },
+    {
+      "name": "London",
+      "lon": -0.128,
+      "lat": 51.507
+    },
+    {
+      "name": "Paris",
+      "lon": 2.352,
+      "lat": 48.857
+    },
+    {
+      "name": "Madrid",
+      "lon": -3.704,
+      "lat": 40.417
+    },
+    {
+      "name": "Rome",
+      "lon": 12.496,
+      "lat": 41.903
+    },
+    {
+      "name": "Warsaw",
+      "lon": 21.012,
+      "lat": 52.23
+    },
+    {
+      "name": "Stockholm",
+      "lon": 18.069,
+      "lat": 59.329
+    },
+    {
+      "name": "Oslo",
+      "lon": 10.752,
+      "lat": 59.914
+    },
+    {
+      "name": "Helsinki",
+      "lon": 24.938,
+      "lat": 60.17
+    },
+    {
+      "name": "Athens",
+      "lon": 23.728,
+      "lat": 37.984
+    },
+    {
+      "name": "Skopje",
+      "lon": 21.432,
+      "lat": 41.998
+    },
+    {
+      "name": "Lisbon",
+      "lon": -9.139,
+      "lat": 38.723
+    },
+    {
+      "name": "Zurich",
+      "lon": 8.542,
+      "lat": 47.377
+    }
+  ],
+  "initial_location": "Berlin",
+  "forecast_days": 14,
+  "temperature_range": [
+    -10,
+    40
+  ],
+  "spread_range": [
+    0,
+    10
+  ],
+  "temperature_colors": [
+    "#607faa",
+    "#87babe",
+    "#e8e9c1",
+    "#eeb97e",
+    "#be6454"
+  ],
+  "spread_colors": [
+    "#f2f0ea",
+    "#d2d8de",
+    "#98acc5",
+    "#677da3",
+    "#414768"
+  ]
+}
