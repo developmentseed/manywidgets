@@ -55,8 +55,15 @@ function optionsFor(dir) {
     platform: "browser",
     target: "es2020",
     sourcemap: false,
+    // The bundle text is stored in every executed notebook (the `_esm` trait) and
+    // shipped in each static page's assets, so size matters more than readability.
+    minify: true,
     // Resolve `import ... from "@manywidgets/core"` to the shared TS source.
     alias: { "@manywidgets/core": coreEntry },
+    // A widget wrapping a library that ships its own stylesheet (geomap +
+    // maplibre-gl) imports that .css as a string and injects it into the shadow
+    // root with `ensureShadowCss` — a <link> would never reach the shadow DOM.
+    loader: { ".css": "text" },
     logLevel: "info",
   };
 }

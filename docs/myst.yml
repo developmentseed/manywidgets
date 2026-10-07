@@ -35,7 +35,12 @@ project:
         - file: widgets/number_display.ipynb
         - file: widgets/text.ipynb
         - file: widgets/legend.ipynb
+        - file: widgets/table.ipynb
         - file: widgets/binder.ipynb
+    - title: Maps
+      children:
+        - file: widgets/geo_map.ipynb
+        - file: examples/geomap-table.ipynb
     - title: Layout
       children:
         - file: widgets/row.ipynb

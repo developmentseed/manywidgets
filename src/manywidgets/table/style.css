@@ -1,0 +1,93 @@
+.manywidgets-table {
+  border: 1px solid var(--mw-color-border);
+  border-radius: var(--mw-control-radius);
+  background: var(--mw-color-surface);
+  margin: 10px 0;
+  font-family: var(--mw-font-family);
+  color: var(--mw-color-text);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.manywidgets-table__title {
+  padding: var(--mw-control-padding-y) var(--mw-control-padding-x);
+  color: var(--mw-color-text-muted);
+  font-size: var(--mw-font-size-sm);
+  font-weight: var(--mw-font-weight-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--mw-color-border);
+}
+
+.manywidgets-table__scroll {
+  overflow: auto;
+}
+
+.manywidgets-table__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--mw-font-size-md);
+}
+
+.manywidgets-table__th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--mw-color-surface-elevated, var(--mw-color-surface));
+  color: var(--mw-color-text-muted);
+  font-size: var(--mw-font-size-sm);
+  font-weight: var(--mw-font-weight-strong);
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--mw-color-border-strong);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.manywidgets-table__th.is-sortable {
+  cursor: pointer;
+}
+
+.manywidgets-table__th.is-sortable:hover {
+  color: var(--mw-color-text);
+}
+
+.manywidgets-table__sort {
+  margin-left: 4px;
+  font-size: 0.7em;
+}
+
+.manywidgets-table__td {
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--mw-color-border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 28em;
+}
+
+.manywidgets-table__th.is-right,
+.manywidgets-table__td.is-right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.manywidgets-table__row {
+  cursor: pointer;
+}
+
+.manywidgets-table__row.is-hovered,
+.manywidgets-table__row:hover {
+  background: var(--mw-color-accent-soft);
+}
+
+.manywidgets-table__row.is-selected {
+  background: var(--mw-color-accent-surface);
+  box-shadow: inset 3px 0 0 var(--mw-color-accent);
+}
+
+.manywidgets-table__empty {
+  padding: var(--mw-control-padding-y) var(--mw-control-padding-x);
+  color: var(--mw-color-text-muted);
+  font-size: var(--mw-font-size-md);
+}

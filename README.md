@@ -9,9 +9,10 @@ MyST plugin.
 
 > **Status:** early but feature-complete for v1 — `Chart`, input controls (`Slider`,
 > `RangeSlider`, `Dropdown`, `Toggle`, `Button`, `NumberInput`), value displays
-> (`Stat`, `NumberDisplay`, `Text`), layout containers (`Row`, `Column`, `Grid`),
-> the `Binder` linking primitive, and optional lonboard interop (`LayerToggle`,
-> `FilterBinder`, `LayerFilter`).
+> (`Stat`, `NumberDisplay`, `Text`), `Table`, `GeoMap` (a MapLibre map with GeoJSON,
+> XYZ-tile and client-styled grid-raster layers), layout containers (`Row`,
+> `Column`, `Grid`), the `Binder` linking primitive, and optional lonboard interop
+> (`LayerToggle`, `FilterBinder`, `LayerFilter`).
 
 ## Install
 
@@ -39,6 +40,8 @@ from manywidgets import (
     Chart,                                   # Chart.js charts
     Slider, RangeSlider, Dropdown, Toggle, Button, NumberInput,  # input controls
     Stat, NumberDisplay, Text, Legend,       # value displays
+    Table,                                   # sortable, selectable table of records
+    GeoMap, GridLayer,                       # MapLibre map: GeoJSON, XYZ tiles, quantized grid rasters
     Row, Column, Grid,                       # layout (arrange + keep children linked)
     Binder,                                  # linking with transforms / nested paths
 )

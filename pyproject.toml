@@ -26,6 +26,8 @@ dependencies = [
 [project.optional-dependencies]
 lonboard = ["lonboard>=0.10"]
 numpy = ["numpy"]
+# GeoMap corner helpers that reproject (corners_from_bounds/_coords with a crs).
+geo = ["numpy", "pyproj>=3"]
 dev = [
     "pytest>=8",
     "numpy",
@@ -80,6 +82,7 @@ ensured-targets = [
     "src/manywidgets/column/dist/widget.js",
     "src/manywidgets/dropdown/dist/widget.js",
     "src/manywidgets/fullscreen/dist/widget.js",
+    "src/manywidgets/geo_map/dist/widget.js",
     "src/manywidgets/grid/dist/widget.js",
     "src/manywidgets/legend/dist/widget.js",
     "src/manywidgets/lonboard/filter_binder/dist/widget.js",
@@ -93,6 +96,7 @@ ensured-targets = [
     "src/manywidgets/row/dist/widget.js",
     "src/manywidgets/slider/dist/widget.js",
     "src/manywidgets/stat/dist/widget.js",
+    "src/manywidgets/table/dist/widget.js",
     "src/manywidgets/text/dist/widget.js",
     "src/manywidgets/toggle/dist/widget.js",
 ]
@@ -103,6 +107,7 @@ skip-if-exists = [
     "src/manywidgets/column/dist/widget.js",
     "src/manywidgets/dropdown/dist/widget.js",
     "src/manywidgets/fullscreen/dist/widget.js",
+    "src/manywidgets/geo_map/dist/widget.js",
     "src/manywidgets/grid/dist/widget.js",
     "src/manywidgets/legend/dist/widget.js",
     "src/manywidgets/lonboard/filter_binder/dist/widget.js",
@@ -116,6 +121,7 @@ skip-if-exists = [
     "src/manywidgets/row/dist/widget.js",
     "src/manywidgets/slider/dist/widget.js",
     "src/manywidgets/stat/dist/widget.js",
+    "src/manywidgets/table/dist/widget.js",
     "src/manywidgets/text/dist/widget.js",
     "src/manywidgets/toggle/dist/widget.js",
 ]
