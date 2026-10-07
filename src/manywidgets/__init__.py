@@ -18,6 +18,7 @@ from .chart import Chart
 from .column import Column
 from .dropdown import Dropdown
 from .fullscreen import Fullscreen
+from .geo_map import GeoMap, GridLayer
 from .grid import Grid
 from .grid_item import GridItem
 from .legend import Legend
@@ -27,6 +28,7 @@ from .range_slider import RangeSlider
 from .row import Row
 from .slider import Slider
 from .stat import Stat
+from .table import Table
 from .text import Text
 from .themes import Theme
 from .toggle import Toggle
@@ -39,6 +41,8 @@ __all__ = [
     "Column",
     "Dropdown",
     "Fullscreen",
+    "GeoMap",
+    "GridLayer",
     "Grid",
     "GridItem",
     "Legend",
@@ -48,6 +52,7 @@ __all__ = [
     "Row",
     "Slider",
     "Stat",
+    "Table",
     "Text",
     "Theme",
     "Toggle",

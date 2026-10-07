@@ -12,6 +12,7 @@ Display a widget by leaving it as the last expression in a notebook cell.
 - **Layout containers:** `Row`, `Column`, `Grid`, `GridItem`, `Fullscreen`
 - **Linking:** `Binder`
 - **Lonboard interop:** `LayerToggle`, `LayerFilter`, `FilterBinder`, `MapFlyer`, `MapCompare`
+- **Other:** `GeoMap`, `Table`
 
 ## Charts & displays
 
