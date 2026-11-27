@@ -1,6 +1,8 @@
 .manywidgets-stat {
   display: inline-block;
   min-width: var(--mw-stat-min-width);
+  /* Never wider than the container (content-box: subtract padding + border). */
+  max-width: calc(100% - 2 * var(--mw-panel-padding-x) - 2px);
   padding: var(--mw-panel-padding-y) var(--mw-panel-padding-x);
   border: 1px solid var(--mw-color-border);
   border-radius: var(--mw-panel-radius);
@@ -19,8 +21,9 @@
 
 .manywidgets-stat__value-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 4px;
+  column-gap: 4px;
   margin-top: 6px;
 }
 
@@ -29,6 +32,7 @@
   font-weight: 700;
   color: var(--mw-color-text);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .manywidgets-stat__unit {
