@@ -1,6 +1,8 @@
 # Stat
 
 A compact metric card: label, value, unit, and an optional signed delta.
+Long values shrink to fit the card, and the unit wraps below the value when
+there isn't room beside it.
 
 ## Import
 

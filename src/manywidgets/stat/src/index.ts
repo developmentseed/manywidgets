@@ -34,10 +34,24 @@ function render({ model, el }: RenderProps<StatModel>): () => void {
   card.appendChild(deltaEl);
   el.appendChild(card);
 
+  // Shrink the value's font so a long number fits the card instead of being
+  // clipped; the unit wraps below it via CSS.
+  function fit(): void {
+    valueEl.style.fontSize = "";
+    const avail = valueRow.clientWidth;
+    const natural = valueEl.getBoundingClientRect().width;
+    if (avail > 0 && natural > avail) {
+      const base = parseFloat(getComputedStyle(valueEl).fontSize);
+      valueEl.style.fontSize = `${Math.floor((base * avail) / natural)}px`;
+    }
+  }
+
   function update(): void {
     labelEl.textContent = model.get("label");
     valueEl.textContent = String(model.get("value"));
     unitEl.textContent = model.get("unit");
+
+    fit();
 
     const delta = model.get("delta");
     if (delta == null || delta === "") {
@@ -55,7 +69,14 @@ function render({ model, el }: RenderProps<StatModel>): () => void {
   update();
   onChanges(model, ["label", "value", "unit", "delta"], update);
 
-  return disposeTheme;
+  const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(fit) : null;
+  observer?.observe(el);
+  document.fonts?.ready.then(fit);
+
+  return () => {
+    observer?.disconnect();
+    disposeTheme();
+  };
 }
 
 export default { render };
